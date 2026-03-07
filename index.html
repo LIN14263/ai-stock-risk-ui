@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Stock Risk UI</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">AI</div>
+      <div>
+        <div class="brand-title" data-i18n="app_title">AI Stock Risk</div>
+        <div class="brand-sub" data-i18n="app_sub">UI Prototype (S1 / S2 / Watchlist)</div>
+      </div>
+    </div>
+
+    <nav class="tabs" aria-label="Primary">
+      <button class="tab active" data-view="dashboard" data-i18n="tab_dashboard">Dashboard</button>
+      <button class="tab" data-view="watchlist" data-i18n="tab_watchlist">Watchlist</button>
+      <button class="tab" data-view="compare" data-i18n="tab_compare">Compare</button>
+      <button class="tab" data-view="reports" data-i18n="tab_reports">Reports</button>
+      <button class="tab" data-view="settings" data-i18n="tab_settings">Settings</button>
+    </nav>
+  </header>
+
+  <main class="container">
+    <!-- DASHBOARD (S1) -->
+    <section id="view-dashboard" class="view active">
+      <div class="section-header">
+        <h1 data-i18n="s1_title">S1 — Stock Risk Dashboard</h1>
+        <div class="search-row">
+          <input id="s1Search" class="input" data-i18n-placeholder="s1_placeholder" placeholder="Enter ticker (e.g., AAPL, MSFT)" />
+          <button class="btn primary" id="s1PredictBtn" data-i18n="btn_predict">Predict Risk</button>
+        </div>
+      </div>
+
+      <div class="grid kpis">
+        <div class="card kpi">
+          <div class="kpi-label" data-i18n="kpi_level">Risk Level</div>
+          <div id="kpiLevel" class="kpi-value badge high">High</div>
+        </div>
+
+        <div class="card kpi">
+          <div class="kpi-label" data-i18n="kpi_score">Risk Score (0–100)</div>
+          <div id="kpiScore" class="kpi-value">78</div>
+        </div>
+
+        <div class="card kpi">
+          <div class="kpi-label" data-i18n="kpi_conf">Confidence (%)</div>
+          <div id="kpiConf" class="kpi-value">82%</div>
+        </div>
+
+        <div class="card kpi">
+          <div class="kpi-label" data-i18n="kpi_update">Last Update</div>
+          <div id="kpiUpdate" class="kpi-value small">2026-03-02 16:00</div>
+        </div>
+      </div>
+
+      <div class="grid s1-main">
+        <div class="card">
+          <h2 class="card-title" data-i18n="s1_summary">Risk Summary</h2>
+
+          <div class="row">
+            <div>
+              <div class="muted" data-i18n="s1_selected">Selected stock</div>
+              <div id="s1Selected" class="big">AAPL — Apple Inc.</div>
+              <div class="muted small-gap">
+                <span data-i18n="s1_7d">7D change:</span>
+                <b id="s1D7" class="num pos">+6</b>
+              </div>
+            </div>
+            <div id="s1Badge" class="badge high">High</div>
+          </div>
+
+          <p id="s1Explain" class="explain">
+            Volatility is rising and drawdown is widening, so risk is upgraded.
+          </p>
+
+          <div class="btn-row">
+            <button class="btn primary" id="btnViewDetails" data-i18n="btn_view_details">View Details</button>
+            <button class="btn" id="btnGoReports" data-i18n="btn_generate_report">Generate Report</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="row">
+            <h2 class="card-title" data-i18n="s1_chart_title">Risk Score Trend</h2>
+            <div class="muted small" id="s1RangeLabel">Range: 1M</div>
+          </div>
+
+          <div class="chart-area">
+            <svg id="s1Chart" class="linechart" viewBox="0 0 600 220" preserveAspectRatio="none">
+              <polyline id="s1Line" fill="none" stroke-width="3"></polyline>
+              <circle id="s1Dot" r="6"></circle>
+              <text id="s1LastText" x="10" y="22" class="chart-text">Latest: 78</text>
+
+              <!-- Axes labels (S1) -->
+              <text id="s1YLabel" class="axis-label" x="14" y="110" transform="rotate(-90 14 110)">Risk Score (0–100)</text>
+              <text id="s1XLabel" class="axis-label" x="300" y="214" text-anchor="middle">Time</text>
+
+              <text id="s1YTick100" class="axis-tick" x="22" y="38">100</text>
+              <text id="s1YTick50" class="axis-tick" x="22" y="118">50</text>
+              <text id="s1YTick0" class="axis-tick" x="22" y="198">0</text>
+
+              <text id="s1XStart" class="axis-tick" x="20" y="214" text-anchor="start">Start</text>
+              <text id="s1XEnd" class="axis-tick" x="580" y="214" text-anchor="end">End</text>
+            </svg>
+          </div>
+
+          <div class="footnote" data-i18n="chart_note">Line updates with prediction and time range.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DETAIL (S2) -->
+    <section id="view-detail" class="view">
+      <div class="section-header">
+        <h1 data-i18n="s2_title">S2 — Risk Score & Drivers</h1>
+
+        <div class="search-row">
+          <button class="btn" id="btnBackToS1" data-i18n="btn_back">Back</button>
+          <div class="pill" id="s2HeaderStock">AAPL — Apple Inc.</div>
+          <button class="btn primary" id="btnAddToWatchlist" data-i18n="btn_add_watchlist">Add to Watchlist</button>
+        </div>
+
+        <div class="time-range">
+          <span class="muted" data-i18n="time_range">Time range:</span>
+          <button class="chip active" data-range="1M">1M</button>
+          <button class="chip" data-range="3M">3M</button>
+          <button class="chip" data-range="6M">6M</button>
+          <button class="chip" data-range="1Y">1Y</button>
+          <button class="chip" data-range="3Y">3Y</button>
+        </div>
+      </div>
+
+      <div class="grid s2-main">
+        <!-- Left -->
+        <div class="card">
+          <h2 class="card-title" data-i18n="s2_output">Risk Output</h2>
+          <div class="kv">
+            <div class="k" data-i18n="kpi_level">Risk Level</div><div id="s2Level" class="v badge high">High</div>
+            <div class="k" data-i18n="kpi_score_short">Risk Score</div><div id="s2Score" class="v">78</div>
+            <div class="k" data-i18n="kpi_conf_short">Confidence</div><div id="s2Conf" class="v">82%</div>
+            <div class="k" data-i18n="s2_7d">7D change</div><div id="s2D7" class="v num pos">+6</div>
+          </div>
+          <p class="explain" id="s2Meaning">
+            This stock shows higher downside risk in the next period.
+          </p>
+        </div>
+
+        <!-- Middle -->
+        <div class="card">
+          <h2 class="card-title" data-i18n="s2_drivers">Key Drivers</h2>
+          <div class="drivers">
+            <div class="driver" id="d1"></div>
+            <div class="driver" id="d2"></div>
+            <div class="driver" id="d3"></div>
+            <div class="driver" id="d4"></div>
+            <div class="driver" id="d5"></div>
+            <div class="driver" id="d6"></div>
+          </div>
+          <div class="hint" data-i18n="s2_driver_hint">These drivers explain why the label changes.</div>
+        </div>
+
+        <!-- Right -->
+        <div class="card">
+          <h2 class="card-title" data-i18n="s2_breakdown_rules">Breakdown & Rules</h2>
+
+          <div class="subblock">
+            <div class="sub-title" data-i18n="s2_breakdown">Risk Breakdown</div>
+            <div class="mini-grid">
+              <div data-i18n="bd_market">Market</div><div class="right"><span id="rbMarket">35%</span></div>
+              <div data-i18n="bd_drawdown">Drawdown</div><div class="right"><span id="rbDrawdown">30%</span></div>
+              <div data-i18n="bd_vol">Volatility</div><div class="right"><span id="rbVol">25%</span></div>
+              <div data-i18n="bd_liq">Liquidity</div><div class="right"><span id="rbLiq">10%</span></div>
+            </div>
+          </div>
+
+          <div class="subblock">
+            <div class="sub-title" data-i18n="s2_metrics">Key Metrics</div>
+            <div class="mini-grid">
+              <div>20D vol</div><div class="right"><span id="mVol20">48%</span></div>
+              <div>60D vol</div><div class="right"><span id="mVol60">39%</span></div>
+              <div>6M MDD</div><div class="right"><span id="mMDD6m">-28%</span></div>
+              <div>Beta</div><div class="right"><span id="mBeta">1.62</span></div>
+              <div data-i18n="metric_volchg">Volume change</div><div class="right"><span id="mVolChg" class="num pos">↑</span></div>
+            </div>
+          </div>
+
+          <div class="subblock">
+            <div class="sub-title" data-i18n="s2_rules">Risk Label Rules</div>
+            <ul class="rules">
+              <li><b data-i18n="rule_high">High</b>: <span data-i18n="rule_high_text">forward 30D drawdown</span> &gt; <span id="rHigh">12%</span></li>
+              <li><b data-i18n="rule_medium">Medium</b>: <span id="rMedLo">6%</span> – <span id="rMedHi">12%</span></li>
+              <li><b data-i18n="rule_low">Low</b>: &lt; <span id="rLow">6%</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Full-width chart -->
+      <div class="card s2-chart-card">
+        <div class="row">
+          <h2 class="card-title" data-i18n="s2_chart_title">Risk Score Trend</h2>
+          <div class="muted small" id="s2RangeLabel">Range: 1M</div>
+        </div>
+        <div class="chart-area">
+          <svg id="s2Chart" class="linechart" viewBox="0 0 900 220" preserveAspectRatio="none">
+            <polyline id="s2Line" fill="none" stroke-width="3"></polyline>
+            <circle id="s2Dot" r="6"></circle>
+            <text id="s2LastText" x="10" y="22" class="chart-text">Latest: 78</text>
+
+            <!-- Axes labels (S2) -->
+            <text id="s2YLabel" class="axis-label" x="14" y="110" transform="rotate(-90 14 110)">Risk Score (0–100)</text>
+            <text id="s2XLabel" class="axis-label" x="450" y="214" text-anchor="middle">Time</text>
+
+            <text id="s2YTick100" class="axis-tick" x="22" y="38">100</text>
+            <text id="s2YTick50" class="axis-tick" x="22" y="118">50</text>
+            <text id="s2YTick0" class="axis-tick" x="22" y="198">0</text>
+
+            <text id="s2XStart" class="axis-tick" x="20" y="214" text-anchor="start">Start</text>
+            <text id="s2XEnd" class="axis-tick" x="880" y="214" text-anchor="end">End</text>
+          </svg>
+        </div>
+        <div class="footnote" data-i18n="chart_note">Line updates with prediction and time range.</div>
+      </div>
+    </section>
+
+    <!-- WATCHLIST -->
+    <section id="view-watchlist" class="view">
+      <div class="section-header">
+        <h1 data-i18n="wl_title">Watchlist & Risk Monitoring</h1>
+
+        <div class="search-row">
+          <input id="wlSearch" class="input" data-i18n-placeholder="wl_placeholder" placeholder="Search ticker/company" />
+          <button class="btn" id="wlFilterBtn" data-i18n="btn_filter_risk">Filter by Risk</button>
+          <select id="wlRiskSelect" class="select" aria-label="Risk filter">
+            <option value="ALL" data-i18n="opt_all">All</option>
+            <option value="HIGH" data-i18n="opt_high">High</option>
+            <option value="MEDIUM" data-i18n="opt_medium">Medium</option>
+            <option value="LOW" data-i18n="opt_low">Low</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="watchlistGrid" class="grid watchlist"></div>
+
+      <div class="note">
+        <b data-i18n="flow">Flow:</b> S2 → Add to Watchlist → Watchlist → View Details → S2
+      </div>
+    </section>
+
+    <!-- COMPARE -->
+    <section id="view-compare" class="view">
+      <div class="section-header">
+        <h1 data-i18n="cmp_title">Compare</h1>
+
+        <div class="search-row">
+          <input id="cmpInput" class="input" data-i18n-placeholder="cmp_placeholder" placeholder="Add ticker (e.g., AAPL)" />
+          <button class="btn" id="cmpAddBtn" data-i18n="btn_add_stock">Add Stock</button>
+
+          <select id="cmpRange" class="select" aria-label="Time range">
+            <option>1M</option>
+            <option>3M</option>
+            <option>6M</option>
+            <option>1Y</option>
+            <option>3Y</option>
+          </select>
+
+          <button class="btn primary" id="cmpGenBtn" data-i18n="btn_gen_compare">Generate Comparison</button>
+        </div>
+      </div>
+
+      <div class="grid s1-main">
+        <div class="card">
+          <h2 class="card-title" data-i18n="cmp_table">Comparison Table</h2>
+          <div id="compareTable" class="table"></div>
+          <div class="footnote" data-i18n="cmp_note">Click View Details to open S2.</div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title" data-i18n="cmp_chart">Charts</h2>
+
+          <div class="chart-stack">
+            <div class="chart-box">
+              <div class="sub-title">Risk score ranking</div>
+              <div id="cmpRankingChart" class="cmp-ranking-chart"></div>
+            </div>
+
+            <div class="chart-box">
+              <div class="sub-title">Risk trend</div>
+              <svg id="cmpTrendChart" viewBox="0 0 520 180" preserveAspectRatio="none" class="cmp-trend-svg">
+                <line x1="30" y1="20" x2="30" y2="150" class="cmp-axis"></line>
+                <line x1="30" y1="150" x2="500" y2="150" class="cmp-axis"></line>
+              </svg>
+            </div>
+          </div>
+
+          <div class="footnote" data-i18n="cmp_chart_note">Ranking and trend update automatically.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- REPORTS -->
+    <section id="view-reports" class="view">
+      <div class="section-header">
+        <h1 data-i18n="rep_title">Reports</h1>
+
+        <div class="search-row">
+          <select id="repTicker" class="select" aria-label="Select ticker"></select>
+
+          <select id="repRange" class="select" aria-label="Time range">
+            <option>1M</option>
+            <option>3M</option>
+            <option>6M</option>
+            <option>1Y</option>
+            <option>3Y</option>
+          </select>
+
+          <button class="btn primary" id="repGenBtn" data-i18n="btn_gen_report">Generate Report</button>
+          <button class="btn" id="repExportBtn" data-i18n="btn_export_pdf">Export PDF</button>
+        </div>
+      </div>
+
+      <div class="grid s1-main">
+        <div class="card">
+          <h2 class="card-title" data-i18n="rep_include">Include sections</h2>
+
+          <div class="checks">
+            <label><input type="checkbox" id="repCkSummary" checked /> <span data-i18n="rep_summary">Risk summary</span></label>
+            <label><input type="checkbox" id="repCkDrivers" checked /> <span data-i18n="rep_drivers">Drivers (Top 6)</span></label>
+            <label><input type="checkbox" id="repCkMetrics" checked /> <span data-i18n="rep_metrics">Metrics & Rules</span></label>
+            <label><input type="checkbox" id="repCkCharts" checked /> <span data-i18n="rep_charts">Charts (placeholders)</span></label>
+            <label><input type="checkbox" id="repCkDisclaimer" checked /> <span data-i18n="rep_disclaimer">Disclaimer</span></label>
+          </div>
+
+          <div class="footnote" data-i18n="rep_note">This prototype shows structure and export buttons (no real PDF).</div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title" data-i18n="rep_preview">Report Preview</h2>
+          <div id="reportPreview" class="preview">
+            <div class="muted" data-i18n="rep_preview_hint">Click Generate Report to preview.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="view-settings" class="view">
+      <div class="section-header">
+        <h1 data-i18n="set_title">Settings</h1>
+        <div class="search-row">
+          <button class="btn primary" id="setSaveBtn" data-i18n="btn_save">Save Changes</button>
+        </div>
+      </div>
+
+      <div class="grid settings">
+        <div class="card">
+          <h2 class="card-title" data-i18n="set_display">Display</h2>
+
+          <div class="kv">
+            <div class="k" data-i18n="set_theme">Theme</div>
+            <div class="v">
+              <select id="setTheme" class="select">
+                <option value="dark" selected data-i18n="theme_dark">Dark</option>
+                <option value="light" data-i18n="theme_light">Light (placeholder)</option>
+              </select>
+            </div>
+
+            <div class="k" data-i18n="set_lang">Language</div>
+            <div class="v">
+              <select id="setLang" class="select">
+                <option value="en" selected>English</option>
+                <option value="zh">中文</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="footnote" data-i18n="set_lang_note">Switch language instantly for UI text.</div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title" data-i18n="set_alerts">Alerts</h2>
+
+          <div class="checks">
+            <label><input type="checkbox" id="setAlertsOn" checked /> <span data-i18n="alerts_enable">Enable alerts</span></label>
+            <label>
+              <span data-i18n="alerts_score">Notify if Risk Score &gt;</span>
+              <input id="setScoreTh" class="mini-input" value="70" />
+            </label>
+            <label><input type="checkbox" id="setHighOn" checked /> <span data-i18n="alerts_high">Notify if Risk Level = High</span></label>
+          </div>
+
+          <div class="footnote" data-i18n="alerts_note">Works with Watchlist filtering and monitoring.</div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title" data-i18n="set_data">Data & Update</h2>
+
+          <div class="kv">
+            <div class="k" data-i18n="set_source">Data source</div>
+            <div class="v">
+              <select id="setData" class="select">
+                <option value="price" selected data-i18n="source_price">Price only</option>
+                <option value="price_news" data-i18n="source_news">Price + News (optional)</option>
+              </select>
+            </div>
+
+            <div class="k" data-i18n="set_freq">Update frequency</div>
+            <div class="v">
+              <select id="setFreq" class="select">
+                <option value="daily" selected data-i18n="freq_daily">Daily</option>
+                <option value="weekly" data-i18n="freq_weekly">Weekly</option>
+              </select>
+            </div>
+
+            <div class="k" data-i18n="set_sync">Last sync</div>
+            <div class="v" id="setSync">2026-03-02 16:00</div>
+          </div>
+
+          <button class="btn" id="setRefreshBtn" data-i18n="btn_refresh">Refresh Data</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
