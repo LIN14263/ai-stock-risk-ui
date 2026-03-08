@@ -245,13 +245,20 @@ function levelToBadgeClass(level) {
   if (level === "MEDIUM") return "medium";
   return "low";
 }
+
 function levelToText(level) {
   return currentLang === "zh"
     ? (level === "HIGH" ? "高" : level === "MEDIUM" ? "中" : "低")
     : (level === "HIGH" ? "High" : level === "MEDIUM" ? "Medium" : "Low");
 }
-function fmt7d(n) { return `${n >= 0 ? "+" : ""}${n}`; }
-function ensureUnique(arr) { return [...new Set(arr)]; }
+
+function fmt7d(n) {
+  return `${n >= 0 ? "+" : ""}${n}`;
+}
+
+function ensureUnique(arr) {
+  return [...new Set(arr)];
+}
 
 function setNumColor(el, n) {
   if (!el) return;
@@ -264,6 +271,65 @@ function setNumColor(el, n) {
 function fmtDateShort(iso) {
   if (!iso) return "";
   return String(iso).slice(0, 10);
+}
+
+function safeText(v, fallback = "-") {
+  if (v === null || v === undefined || v === "") return fallback;
+  return String(v);
+}
+
+function getCompareXLabels(range) {
+  if (currentLang === "zh") {
+    if (range === "1M") return { start: "1个月前", mid: "中间", end: "现在" };
+    if (range === "3M") return { start: "3个月前", mid: "中间", end: "现在" };
+    if (range === "6M") return { start: "6个月前", mid: "中间", end: "现在" };
+    if (range === "1Y") return { start: "1年前", mid: "中间", end: "现在" };
+    if (range === "3Y") return { start: "3年前", mid: "中间", end: "现在" };
+    return { start: "开始", mid: "中间", end: "结束" };
+  }
+
+  if (range === "1M") return { start: "1M Ago", mid: "Middle", end: "Now" };
+  if (range === "3M") return { start: "3M Ago", mid: "Middle", end: "Now" };
+  if (range === "6M") return { start: "6M Ago", mid: "Middle", end: "Now" };
+  if (range === "1Y") return { start: "1Y Ago", mid: "Middle", end: "Now" };
+  if (range === "3Y") return { start: "3Y Ago", mid: "Middle", end: "Now" };
+  return { start: "Start", mid: "Middle", end: "End" };
+}
+
+function buildCompareSeries(stock) {
+  const base = Number(stock.score) || 0;
+  const d7 = Number(stock.d7) || 0;
+
+  const series = [
+    Math.max(0, base - 8),
+    Math.max(0, base - 5),
+    Math.max(0, base - 2),
+    Math.max(0, Math.min(100, base + Math.round(d7 / 2))),
+    Math.max(0, Math.min(100, base))
+  ];
+
+  return series.map(v => Math.max(0, Math.min(100, v)));
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function applyTheme(theme) {
+  document.body.classList.remove("light-theme", "dark-theme");
+
+  if (theme === "light") {
+    document.body.classList.add("light-theme");
+  } else {
+    document.body.classList.add("dark-theme");
+  }
+
+  localStorage.setItem("theme", theme);
 }
 
 // ----- Data fetch -----
@@ -290,6 +356,7 @@ function computeRiskSeriesFromCloses(closes) {
       const r = (window[k] / window[k - 1]) - 1;
       if (Number.isFinite(r)) rets.push(r);
     }
+
     if (rets.length < 2) {
       scores.push(0);
       continue;
@@ -375,66 +442,124 @@ function renderCompareRanking() {
 
   box.innerHTML = items.map(s => `
     <div class="cmp-rank-row">
-      <div class="cmp-rank-name">${s.ticker}</div>
+      <div class="cmp-rank-name">${escapeHtml(s.ticker)}</div>
       <div class="cmp-rank-bar-wrap">
-        <div class="cmp-rank-bar" style="width:${Math.max(4, s.score)}%"></div>
+        <div class="cmp-rank-bar" style="width:${Math.max(4, Number(s.score) || 0)}%"></div>
       </div>
-      <div class="cmp-rank-score">${s.score}</div>
+      <div class="cmp-rank-score">${safeText(s.score, 0)}</div>
     </div>
   `).join("");
 }
 
 function renderCompareTrend() {
   const svg = document.getElementById("cmpTrendChart");
-  if (!svg) return;
+  const linesGroup = document.getElementById("cmpTrendLines");
+  const dotsGroup = document.getElementById("cmpTrendDots");
+  const labelsGroup = document.getElementById("cmpTrendLabels");
+  if (!svg || !linesGroup || !dotsGroup || !labelsGroup) return;
 
-  svg.innerHTML = `
-    <line x1="30" y1="20" x2="30" y2="150" class="cmp-axis"></line>
-    <line x1="30" y1="150" x2="500" y2="150" class="cmp-axis"></line>
-  `;
+  linesGroup.innerHTML = "";
+  dotsGroup.innerHTML = "";
+  labelsGroup.innerHTML = "";
 
   const items = compareList.map(t => STOCKS[t]).filter(Boolean);
   if (!items.length) return;
 
+  const xStartEl = document.getElementById("cmpXStart");
+  const xMidEl = document.getElementById("cmpXMid");
+  const xEndEl = document.getElementById("cmpXEnd");
+  const labels = getCompareXLabels(currentRange);
+
+  if (xStartEl) xStartEl.textContent = labels.start;
+  if (xMidEl) xMidEl.textContent = labels.mid;
+  if (xEndEl) xEndEl.textContent = labels.end;
+
   const colors = [
-    "rgba(255,255,255,0.9)",
+    "rgba(255,255,255,0.92)",
     "rgba(90,255,160,0.95)",
     "rgba(255,90,120,0.95)",
     "rgba(120,180,255,0.95)",
-    "rgba(255,210,90,0.95)"
+    "rgba(255,210,90,0.95)",
+    "rgba(190,140,255,0.95)"
   ];
 
+  const left = 70;
+  const right = 580;
+  const top = 40;
+  const bottom = 220;
+  const width = right - left;
+  const height = bottom - top;
+
+  const endLabels = [];
+
   items.forEach((s, idx) => {
-    const base = Number(s.score) || 0;
-    const d7 = Number(s.d7) || 0;
+    const series = buildCompareSeries(s);
 
-    const series = [
-      Math.max(0, base - 8),
-      Math.max(0, base - 5),
-      Math.max(0, base - 2),
-      Math.max(0, Math.min(100, base + Math.round(d7 / 2))),
-      base
-    ].map(v => Math.max(0, Math.min(100, v)));
-
-    const points = series.map((v, i) => {
-      const x = 30 + (i / (series.length - 1)) * 470;
-      const y = 150 - (v / 100) * 120;
-      return `${x},${y}`;
-    }).join(" ");
+    const pts = series.map((v, i) => {
+      const x = left + (i / Math.max(1, series.length - 1)) * width;
+      const y = bottom - (v / 100) * height;
+      return { x, y, v };
+    });
 
     const poly = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-    poly.setAttribute("points", points);
+    poly.setAttribute("points", pts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" "));
     poly.setAttribute("class", "cmp-trend-line");
     poly.setAttribute("stroke", colors[idx % colors.length]);
-    svg.appendChild(poly);
+    linesGroup.appendChild(poly);
 
-    const last = points.split(" ").pop().split(",");
-    const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    label.setAttribute("x", Number(last[0]) + 6);
-    label.setAttribute("y", Number(last[1]) + 4);
-    label.setAttribute("class", "cmp-trend-label");
-    label.textContent = s.ticker;
-    svg.appendChild(label);
+    pts.forEach((p, pointIdx) => {
+      const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      dot.setAttribute("cx", p.x.toFixed(1));
+      dot.setAttribute("cy", p.y.toFixed(1));
+      dot.setAttribute("r", pointIdx === pts.length - 1 ? "4.5" : "3");
+      dot.setAttribute("fill", colors[idx % colors.length]);
+      dotsGroup.appendChild(dot);
+    });
+
+    const last = pts[pts.length - 1];
+    endLabels.push({
+      ticker: s.ticker,
+      x: last.x + 10,
+      y: last.y,
+      color: colors[idx % colors.length]
+    });
+  });
+
+  endLabels.sort((a, b) => a.y - b.y);
+
+  const minGap = 18;
+  for (let i = 1; i < endLabels.length; i++) {
+    if (endLabels[i].y - endLabels[i - 1].y < minGap) {
+      endLabels[i].y = endLabels[i - 1].y + minGap;
+    }
+  }
+
+  const maxY = bottom - 2;
+  const minY = top + 8;
+  for (let i = endLabels.length - 1; i >= 0; i--) {
+    if (endLabels[i].y > maxY) endLabels[i].y = maxY - (endLabels.length - 1 - i) * minGap;
+  }
+  for (let i = 0; i < endLabels.length; i++) {
+    if (endLabels[i].y < minY) endLabels[i].y = minY + i * minGap;
+  }
+
+  endLabels.forEach(lbl => {
+    const connector = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    connector.setAttribute("x1", "580");
+    connector.setAttribute("y1", lbl.y.toFixed(1));
+    connector.setAttribute("x2", "592");
+    connector.setAttribute("y2", lbl.y.toFixed(1));
+    connector.setAttribute("stroke", lbl.color);
+    connector.setAttribute("stroke-width", "1.5");
+    labelsGroup.appendChild(connector);
+
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("x", "596");
+    text.setAttribute("y", (lbl.y + 4).toFixed(1));
+    text.setAttribute("class", "cmp-trend-label");
+    text.setAttribute("fill", lbl.color);
+    text.textContent = lbl.ticker;
+    labelsGroup.appendChild(text);
   });
 }
 
@@ -458,6 +583,7 @@ function predictRisk(ticker) {
     `Liquidity is healthy, which affects swings.`,
     `Sentiment / event risk is ${level === "HIGH" ? "increased" : "neutral"}.`,
   ];
+
   const driversZH = [
     `近20/60日波动率${level === "LOW" ? "较稳定" : "上升"}。`,
     `最大回撤${level === "HIGH" ? "扩大" : "处于中等水平"}。`,
@@ -623,13 +749,14 @@ function applyPrediction(pred) {
         : (currentLang === "zh" ? "该股票风险较低，但仍需关注市场变化。" : "This stock shows lower risk based on recent stability.");
   }
 
-  ["d1","d2","d3","d4","d5","d6"].forEach((id, idx) => {
+  ["d1", "d2", "d3", "d4", "d5", "d6"].forEach((id, idx) => {
     const el = document.getElementById(id);
     if (el) el.textContent = pred.drivers[idx] || "";
   });
 
   const s1RangeLabel = document.getElementById("s1RangeLabel");
   if (s1RangeLabel) s1RangeLabel.textContent = `${currentLang === "zh" ? "范围：" : "Range: "}${currentRange}`;
+
   const s2RangeLabel = document.getElementById("s2RangeLabel");
   if (s2RangeLabel) s2RangeLabel.textContent = `${currentLang === "zh" ? "范围：" : "Range: "}${currentRange}`;
 
@@ -667,6 +794,7 @@ function applyPrediction(pred) {
 function switchView(viewName) {
   document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.view === viewName));
   document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+
   const el = document.getElementById(`view-${viewName}`);
   if (el) el.classList.add("active");
 
@@ -702,20 +830,20 @@ function renderWatchlist() {
     card.innerHTML = `
       <div class="w-top">
         <div>
-          <div class="w-name">${s.ticker}</div>
-          <div class="w-sub">${s.name}</div>
+          <div class="w-name">${escapeHtml(s.ticker)}</div>
+          <div class="w-sub">${escapeHtml(s.name)}</div>
         </div>
         <div class="badge ${levelToBadgeClass(s.level)}">${levelToText(s.level)}</div>
       </div>
 
       <div class="w-mid">
-        <div><span class="muted">Score:</span> <b>${s.score}</b></div>
+        <div><span class="muted">Score:</span> <b>${safeText(s.score, 0)}</b></div>
         <div><span class="muted">7D:</span> <b class="num ${d7Class}">${fmt7d(s.d7)}</b></div>
       </div>
 
       <div class="w-actions">
-        <button class="btn primary" data-action="details" data-ticker="${s.ticker}">${currentLang === "zh" ? "查看详情" : "View Details"}</button>
-        <button class="btn" data-action="remove" data-ticker="${s.ticker}">${currentLang === "zh" ? "移除" : "Remove"}</button>
+        <button class="btn primary" data-action="details" data-ticker="${escapeHtml(s.ticker)}">${currentLang === "zh" ? "查看详情" : "View Details"}</button>
+        <button class="btn" data-action="remove" data-ticker="${escapeHtml(s.ticker)}">${currentLang === "zh" ? "移除" : "Remove"}</button>
       </div>
     `;
     grid.appendChild(card);
@@ -725,11 +853,13 @@ function renderWatchlist() {
     btn.addEventListener("click", async () => {
       const action = btn.dataset.action;
       const ticker = btn.dataset.ticker;
+
       if (action === "details") {
         const pred = await predictRiskOnline(ticker, currentRange);
         applyPrediction(pred);
         switchView("detail");
       }
+
       if (action === "remove") {
         watchlist = watchlist.filter((t) => t !== ticker);
         renderWatchlist();
@@ -744,6 +874,7 @@ function renderCompare() {
   if (!box) return;
 
   compareList = ensureUnique(compareList).filter((t) => STOCKS[t]);
+
   if (compareList.length === 0) {
     box.innerHTML = `<div class="muted">${currentLang === "zh" ? "未选择股票。" : "No stocks selected."}</div>`;
     renderCompareRanking();
@@ -751,32 +882,29 @@ function renderCompare() {
     return;
   }
 
-  const rows = compareList.map((t) => {
+  const cards = compareList.map((t) => {
     const s = STOCKS[t];
     const d7Class = s.d7 > 0 ? "pos" : s.d7 < 0 ? "neg" : "neu";
+
     return `
-      <div class="trow">
-        <div class="cell"><b>${s.ticker}</b><div class="muted">${s.name}</div></div>
-        <div class="cell"><span class="badge ${levelToBadgeClass(s.level)}">${levelToText(s.level)}</span></div>
-        <div class="cell">Score: <b>${s.score}</b></div>
-        <div class="cell">Conf: <b>${s.conf}%</b></div>
-        <div class="cell">7D: <b class="num ${d7Class}">${fmt7d(s.d7)}</b></div>
-        <div class="cell"><button class="btn primary cmpDetails" data-ticker="${s.ticker}">${currentLang === "zh" ? "查看详情" : "View Details"}</button></div>
+      <div class="compare-item">
+        <strong>${escapeHtml(s.ticker)}</strong>
+        <div class="muted">${escapeHtml(s.name)}</div>
+
+        <div class="badge ${levelToBadgeClass(s.level)}">${levelToText(s.level)}</div>
+
+        <div><span class="muted">${currentLang === "zh" ? "评分" : "Score"}:</span> <b>${safeText(s.score, 0)}</b></div>
+        <div><span class="muted">${currentLang === "zh" ? "置信度" : "Confidence"}:</span> <b>${safeText(s.conf, 0)}%</b></div>
+        <div><span class="muted">7D:</span> <b class="num ${d7Class}">${fmt7d(s.d7)}</b></div>
+
+        <button class="btn primary cmpDetails" data-ticker="${escapeHtml(s.ticker)}">
+          ${currentLang === "zh" ? "查看详情" : "View Details"}
+        </button>
       </div>
     `;
   }).join("");
 
-  box.innerHTML = `
-    <div class="thead">
-      <div class="cell">${currentLang === "zh" ? "股票" : "Stock"}</div>
-      <div class="cell">${currentLang === "zh" ? "风险" : "Risk"}</div>
-      <div class="cell">${currentLang === "zh" ? "评分" : "Score"}</div>
-      <div class="cell">${currentLang === "zh" ? "置信度" : "Confidence"}</div>
-      <div class="cell">7D</div>
-      <div class="cell">${currentLang === "zh" ? "操作" : "Action"}</div>
-    </div>
-    ${rows}
-  `;
+  box.innerHTML = cards;
 
   box.querySelectorAll(".cmpDetails").forEach((btn) => {
     btn.addEventListener("click", async () => {
@@ -795,37 +923,126 @@ function renderCompare() {
 function initReportsDropdown() {
   const sel = document.getElementById("repTicker");
   if (!sel) return;
-  sel.innerHTML = Object.keys(STOCKS).sort().map((t) => `<option value="${t}">${t} — ${STOCKS[t].name}</option>`).join("");
+
+  sel.innerHTML = Object.keys(STOCKS)
+    .sort()
+    .map((t) => `<option value="${escapeHtml(t)}">${escapeHtml(t)} — ${escapeHtml(STOCKS[t].name)}</option>`)
+    .join("");
+
   sel.value = selectedTicker || "AAPL";
 }
 
-async function buildReportPreview(ticker) {
-  const pred = await predictRiskOnline(ticker, currentRange);
+async function buildReportPreview(ticker, rangeOverride = currentRange) {
+  const pred = await predictRiskOnline(ticker, rangeOverride);
   const ck = (id) => document.getElementById(id)?.checked;
 
   const parts = [];
+
   if (ck("repCkSummary")) {
-    parts.push(`<div class="pblock"><b>1) Executive summary</b><ul>
-      <li>Risk Level: ${levelToText(pred.level)}</li>
-      <li>Risk Score: ${pred.score} / 100</li>
-      <li>Confidence: ${pred.conf}%</li>
-      <li>7D change: ${fmt7d(pred.d7)}</li>
-    </ul></div>`);
-  }
-  if (ck("repCkDrivers")) {
-    parts.push(`<div class="pblock"><b>2) Drivers (Top 6)</b><div class="muted">${pred.drivers.join("<br/>")}</div></div>`);
-  }
-  if (ck("repCkMetrics")) {
-    parts.push(`<div class="pblock"><b>3) Metrics & Rules</b><div class="muted">Rules: High &gt; ${pred.rules.high}%, Medium ${pred.rules.medLo}%–${pred.rules.medHi}%, Low &lt; ${pred.rules.low}%</div></div>`);
-  }
-  if (ck("repCkCharts")) {
-    parts.push(`<div class="pblock"><b>4) Charts</b><div class="muted">Risk Score Trend (shown in S1/S2 and Compare)</div></div>`);
-  }
-  if (ck("repCkDisclaimer")) {
-    parts.push(`<div class="pblock"><b>5) Disclaimer</b><div class="muted">${currentLang === "zh" ? "仅用于学习展示，不构成投资建议。" : "For educational use only. Not financial advice."}</div></div>`);
+    parts.push(`
+      <div class="pblock">
+        <b>1) Executive summary</b>
+        <ul>
+          <li>Risk Level: ${levelToText(pred.level)}</li>
+          <li>Risk Score: ${pred.score} / 100</li>
+          <li>Confidence: ${pred.conf}%</li>
+          <li>7D change: ${fmt7d(pred.d7)}</li>
+        </ul>
+      </div>
+    `);
   }
 
-  return `<div class="pblock"><b>${currentLang === "zh" ? "报告对象：" : "Report for:"}</b> ${pred.ticker} — ${STOCKS[pred.ticker]?.name || pred.name}</div>${parts.join("")}`;
+  if (ck("repCkDrivers")) {
+    parts.push(`
+      <div class="pblock">
+        <b>2) Drivers (Top 6)</b>
+        <div class="muted">${pred.drivers.join("<br/>")}</div>
+      </div>
+    `);
+  }
+
+  if (ck("repCkMetrics")) {
+    parts.push(`
+      <div class="pblock">
+        <b>3) Metrics & Rules</b>
+        <div class="muted">
+          Rules: High &gt; ${pred.rules.high}%, Medium ${pred.rules.medLo}%–${pred.rules.medHi}%, Low &lt; ${pred.rules.low}%
+        </div>
+      </div>
+    `);
+  }
+
+  if (ck("repCkCharts")) {
+    parts.push(`
+      <div class="pblock">
+        <b>4) Charts</b>
+        <div class="muted">Risk Score Trend (shown in S1/S2 and Compare)</div>
+      </div>
+    `);
+  }
+
+  if (ck("repCkDisclaimer")) {
+    parts.push(`
+      <div class="pblock">
+        <b>5) Disclaimer</b>
+        <div class="muted">
+          ${currentLang === "zh" ? "仅用于学习展示，不构成投资建议。" : "For educational use only. Not financial advice."}
+        </div>
+      </div>
+    `);
+  }
+
+  return `
+    <div class="report-two-col">
+      <div class="report-main">
+        <div class="pblock">
+          <b>${currentLang === "zh" ? "报告对象：" : "Report for:"}</b>
+          ${escapeHtml(pred.ticker)} — ${escapeHtml(STOCKS[pred.ticker]?.name || pred.name)}
+        </div>
+        ${parts.join("")}
+      </div>
+
+      <aside class="report-side">
+        <div class="report-side-card">
+          <div class="report-side-title">${currentLang === "zh" ? "Report Notes" : "Report Notes"}</div>
+          <div class="report-side-text">
+            ${currentLang === "zh"
+              ? `
+                当前预览采用左右分布。
+                <br>左侧显示报告正文内容，
+                <br>右侧显示说明、摘要与状态信息。
+              `
+              : `
+                This preview uses a left-right layout.
+                <br>The left side shows the main report content.
+                <br>The right side shows notes, summary and status info.
+              `}
+          </div>
+        </div>
+
+        <div class="report-side-card">
+          <div class="report-side-title">${currentLang === "zh" ? "Quick Summary" : "Quick Summary"}</div>
+          <div class="report-side-text">
+            <div><span class="muted">Ticker:</span> <b>${escapeHtml(pred.ticker)}</b></div>
+            <div><span class="muted">Level:</span> <b>${levelToText(pred.level)}</b></div>
+            <div><span class="muted">Score:</span> <b>${pred.score}</b></div>
+            <div><span class="muted">Confidence:</span> <b>${pred.conf}%</b></div>
+            <div><span class="muted">Range:</span> <b>${rangeOverride}</b></div>
+            <div><span class="muted">7D:</span> <b class="${pred.d7 > 0 ? "num pos" : pred.d7 < 0 ? "num neg" : "num neu"}">${fmt7d(pred.d7)}</b></div>
+          </div>
+        </div>
+
+        <div class="report-side-card">
+          <div class="report-side-title">${currentLang === "zh" ? "Layout Purpose" : "Layout Purpose"}</div>
+          <div class="report-side-text">
+            ${currentLang === "zh"
+              ? "这样可以让右侧不再留白，同时让报告界面更完整、更像正式系统。"
+              : "This fills the empty right side and makes the report look more complete and dashboard-like."}
+          </div>
+        </div>
+      </aside>
+    </div>
+  `;
 }
 
 // ----- Language -----
@@ -911,7 +1128,7 @@ function startAutoRefresh() {
     } catch (e) {
       console.error("Auto refresh failed:", e);
     }
-  }, 10000); // 10 seconds
+  }, 10000);
 }
 
 function stopAutoRefresh() {
@@ -1023,13 +1240,20 @@ window.addEventListener("DOMContentLoaded", async () => {
     renderCompare();
   });
 
+  document.getElementById("cmpInput").addEventListener("keydown", async (e) => {
+    if (e.key === "Enter") {
+      document.getElementById("cmpAddBtn").click();
+    }
+  });
+
   document.getElementById("cmpGenBtn").addEventListener("click", async () => {
     await refreshCompareData();
   });
 
   document.getElementById("repGenBtn").addEventListener("click", async () => {
     const ticker = document.getElementById("repTicker").value || selectedTicker;
-    document.getElementById("reportPreview").innerHTML = await buildReportPreview(ticker);
+    const repRange = document.getElementById("repRange")?.value || currentRange;
+    document.getElementById("reportPreview").innerHTML = await buildReportPreview(ticker, repRange);
   });
 
   document.getElementById("repExportBtn").addEventListener("click", () => {
@@ -1037,7 +1261,9 @@ window.addEventListener("DOMContentLoaded", async () => {
   });
 
   document.getElementById("setSaveBtn").addEventListener("click", () => {
-    alert(currentLang === "zh" ? "已保存（原型）" : "Settings saved (prototype).");
+    const theme = document.getElementById("setTheme")?.value || "dark";
+    applyTheme(theme);
+    alert(currentLang === "zh" ? "设置已保存" : "Settings saved.");
   });
 
   document.getElementById("setRefreshBtn").addEventListener("click", async () => {
@@ -1051,8 +1277,20 @@ window.addEventListener("DOMContentLoaded", async () => {
     await applyLanguage(e.target.value);
   });
 
+  const themeSelect = document.getElementById("setTheme");
+  if (themeSelect) {
+    const savedTheme = localStorage.getItem("theme") || "dark";
+    themeSelect.value = savedTheme;
+    applyTheme(savedTheme);
+
+    themeSelect.addEventListener("change", (e) => {
+      applyTheme(e.target.value);
+    });
+  }
+
   await applyLanguage("en");
   await setRange("1M");
+
   const pred = await predictRiskOnline(selectedTicker, currentRange);
   applyPrediction(pred);
   renderWatchlist();

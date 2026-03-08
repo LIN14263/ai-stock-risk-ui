@@ -32,7 +32,12 @@
       <div class="section-header">
         <h1 data-i18n="s1_title">S1 — Stock Risk Dashboard</h1>
         <div class="search-row">
-          <input id="s1Search" class="input" data-i18n-placeholder="s1_placeholder" placeholder="Enter ticker (e.g., AAPL, MSFT)" />
+          <input
+            id="s1Search"
+            class="input"
+            data-i18n-placeholder="s1_placeholder"
+            placeholder="Enter ticker (e.g., AAPL, MSFT)"
+          />
           <button class="btn primary" id="s1PredictBtn" data-i18n="btn_predict">Predict Risk</button>
         </div>
       </div>
@@ -44,7 +49,7 @@
         </div>
 
         <div class="card kpi">
-          <div class="kpi-label" data-i18n="kpi_score">Risk Score (0–100)</div>
+          <div class="kpi-label" data-i18n="kpi_score">Risk Score (0-100)</div>
           <div id="kpiScore" class="kpi-value">78</div>
         </div>
 
@@ -97,8 +102,7 @@
               <circle id="s1Dot" r="6"></circle>
               <text id="s1LastText" x="10" y="22" class="chart-text">Latest: 78</text>
 
-              <!-- Axes labels (S1) -->
-              <text id="s1YLabel" class="axis-label" x="14" y="110" transform="rotate(-90 14 110)">Risk Score (0–100)</text>
+              <text id="s1YLabel" class="axis-label" x="14" y="110" transform="rotate(-90 14 110)">Risk Score (0-100)</text>
               <text id="s1XLabel" class="axis-label" x="300" y="214" text-anchor="middle">Time</text>
 
               <text id="s1YTick100" class="axis-tick" x="22" y="38">100</text>
@@ -137,21 +141,27 @@
       </div>
 
       <div class="grid s2-main">
-        <!-- Left -->
         <div class="card">
           <h2 class="card-title" data-i18n="s2_output">Risk Output</h2>
           <div class="kv">
-            <div class="k" data-i18n="kpi_level">Risk Level</div><div id="s2Level" class="v badge high">High</div>
-            <div class="k" data-i18n="kpi_score_short">Risk Score</div><div id="s2Score" class="v">78</div>
-            <div class="k" data-i18n="kpi_conf_short">Confidence</div><div id="s2Conf" class="v">82%</div>
-            <div class="k" data-i18n="s2_7d">7D change</div><div id="s2D7" class="v num pos">+6</div>
+            <div class="k" data-i18n="kpi_level">Risk Level</div>
+            <div id="s2Level" class="v badge high">High</div>
+
+            <div class="k" data-i18n="kpi_score_short">Risk Score</div>
+            <div id="s2Score" class="v">78</div>
+
+            <div class="k" data-i18n="kpi_conf_short">Confidence</div>
+            <div id="s2Conf" class="v">82%</div>
+
+            <div class="k" data-i18n="s2_7d">7D change</div>
+            <div id="s2D7" class="v num pos">+6</div>
           </div>
+
           <p class="explain" id="s2Meaning">
             This stock shows higher downside risk in the next period.
           </p>
         </div>
 
-        <!-- Middle -->
         <div class="card">
           <h2 class="card-title" data-i18n="s2_drivers">Key Drivers</h2>
           <div class="drivers">
@@ -165,7 +175,6 @@
           <div class="hint" data-i18n="s2_driver_hint">These drivers explain why the label changes.</div>
         </div>
 
-        <!-- Right -->
         <div class="card">
           <h2 class="card-title" data-i18n="s2_breakdown_rules">Breakdown & Rules</h2>
 
@@ -194,27 +203,26 @@
             <div class="sub-title" data-i18n="s2_rules">Risk Label Rules</div>
             <ul class="rules">
               <li><b data-i18n="rule_high">High</b>: <span data-i18n="rule_high_text">forward 30D drawdown</span> &gt; <span id="rHigh">12%</span></li>
-              <li><b data-i18n="rule_medium">Medium</b>: <span id="rMedLo">6%</span> – <span id="rMedHi">12%</span></li>
+              <li><b data-i18n="rule_medium">Medium</b>: <span id="rMedLo">6%</span> - <span id="rMedHi">12%</span></li>
               <li><b data-i18n="rule_low">Low</b>: &lt; <span id="rLow">6%</span></li>
             </ul>
           </div>
         </div>
       </div>
 
-      <!-- Full-width chart -->
       <div class="card s2-chart-card">
         <div class="row">
           <h2 class="card-title" data-i18n="s2_chart_title">Risk Score Trend</h2>
           <div class="muted small" id="s2RangeLabel">Range: 1M</div>
         </div>
+
         <div class="chart-area">
           <svg id="s2Chart" class="linechart" viewBox="0 0 900 220" preserveAspectRatio="none">
             <polyline id="s2Line" fill="none" stroke-width="3"></polyline>
             <circle id="s2Dot" r="6"></circle>
             <text id="s2LastText" x="10" y="22" class="chart-text">Latest: 78</text>
 
-            <!-- Axes labels (S2) -->
-            <text id="s2YLabel" class="axis-label" x="14" y="110" transform="rotate(-90 14 110)">Risk Score (0–100)</text>
+            <text id="s2YLabel" class="axis-label" x="14" y="110" transform="rotate(-90 14 110)">Risk Score (0-100)</text>
             <text id="s2XLabel" class="axis-label" x="450" y="214" text-anchor="middle">Time</text>
 
             <text id="s2YTick100" class="axis-tick" x="22" y="38">100</text>
@@ -225,6 +233,7 @@
             <text id="s2XEnd" class="axis-tick" x="880" y="214" text-anchor="end">End</text>
           </svg>
         </div>
+
         <div class="footnote" data-i18n="chart_note">Line updates with prediction and time range.</div>
       </div>
     </section>
@@ -277,7 +286,7 @@
       <div class="grid s1-main">
         <div class="card">
           <h2 class="card-title" data-i18n="cmp_table">Comparison Table</h2>
-          <div id="compareTable" class="table"></div>
+          <div id="compareTable" class="compare-list"></div>
           <div class="footnote" data-i18n="cmp_note">Click View Details to open S2.</div>
         </div>
 
@@ -292,9 +301,31 @@
 
             <div class="chart-box">
               <div class="sub-title">Risk trend</div>
-              <svg id="cmpTrendChart" viewBox="0 0 520 180" preserveAspectRatio="none" class="cmp-trend-svg">
-                <line x1="30" y1="20" x2="30" y2="150" class="cmp-axis"></line>
-                <line x1="30" y1="150" x2="500" y2="150" class="cmp-axis"></line>
+
+              <svg id="cmpTrendChart" viewBox="0 0 620 280" preserveAspectRatio="none" class="cmp-trend-svg">
+                <line x1="70" y1="40" x2="580" y2="40" class="cmp-grid-line"></line>
+                <line x1="70" y1="100" x2="580" y2="100" class="cmp-grid-line"></line>
+                <line x1="70" y1="160" x2="580" y2="160" class="cmp-grid-line"></line>
+                <line x1="70" y1="220" x2="580" y2="220" class="cmp-grid-line"></line>
+
+                <line x1="70" y1="30" x2="70" y2="220" class="cmp-axis"></line>
+                <line x1="70" y1="220" x2="580" y2="220" class="cmp-axis"></line>
+
+                <text x="58" y="44" text-anchor="end" class="cmp-axis-text">100</text>
+                <text x="58" y="104" text-anchor="end" class="cmp-axis-text">70</text>
+                <text x="58" y="164" text-anchor="end" class="cmp-axis-text">40</text>
+                <text x="58" y="224" text-anchor="end" class="cmp-axis-text">0</text>
+
+                <text id="cmpXStart" x="70" y="244" text-anchor="start" class="cmp-axis-text">Start</text>
+                <text id="cmpXMid" x="325" y="244" text-anchor="middle" class="cmp-axis-text">Middle</text>
+                <text id="cmpXEnd" x="580" y="244" text-anchor="end" class="cmp-axis-text">End</text>
+
+                <text x="325" y="268" text-anchor="middle" class="cmp-axis-title">Time</text>
+                <text x="22" y="130" text-anchor="middle" transform="rotate(-90 22 130)" class="cmp-axis-title">Risk Score</text>
+
+                <g id="cmpTrendLines"></g>
+                <g id="cmpTrendDots"></g>
+                <g id="cmpTrendLabels"></g>
               </svg>
             </div>
           </div>
@@ -325,22 +356,24 @@
         </div>
       </div>
 
-      <div class="grid s1-main">
-        <div class="card">
+      <div class="reports-layout">
+        <div class="card reports-controls-card">
           <h2 class="card-title" data-i18n="rep_include">Include sections</h2>
 
-          <div class="checks">
+          <div class="checks reports-checks-inline">
             <label><input type="checkbox" id="repCkSummary" checked /> <span data-i18n="rep_summary">Risk summary</span></label>
             <label><input type="checkbox" id="repCkDrivers" checked /> <span data-i18n="rep_drivers">Drivers (Top 6)</span></label>
             <label><input type="checkbox" id="repCkMetrics" checked /> <span data-i18n="rep_metrics">Metrics & Rules</span></label>
-            <label><input type="checkbox" id="repCkCharts" checked /> <span data-i18n="rep_charts">Charts (placeholders)</span></label>
+            <label><input type="checkbox" id="repCkCharts" checked /> <span data-i18n="rep_charts">Charts</span></label>
             <label><input type="checkbox" id="repCkDisclaimer" checked /> <span data-i18n="rep_disclaimer">Disclaimer</span></label>
           </div>
 
-          <div class="footnote" data-i18n="rep_note">This prototype shows structure and export buttons (no real PDF).</div>
+          <div class="footnote" data-i18n="rep_note">
+            This prototype shows structure and export buttons (no real PDF).
+          </div>
         </div>
 
-        <div class="card">
+        <div class="card reports-preview-card">
           <h2 class="card-title" data-i18n="rep_preview">Report Preview</h2>
           <div id="reportPreview" class="preview">
             <div class="muted" data-i18n="rep_preview_hint">Click Generate Report to preview.</div>
