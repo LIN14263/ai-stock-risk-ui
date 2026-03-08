@@ -221,11 +221,11 @@ let autoRefreshTimer = null;
 const STOCKS = {
   AAPL: { ticker: "AAPL", name: "Apple Inc.", level: "LOW", score: 35, conf: 76, d7: -7 },
   TSLA: { ticker: "TSLA", name: "Tesla, Inc.", level: "MEDIUM", score: 62, conf: 69, d7: -3 },
-  NVDA: { ticker: "NVDA", name: "NVIDIA Corp.", level: "HIGH", score: 85, conf: 79, d7: +9 },
-  AMZN: { ticker: "AMZN", name: "Amazon.com, Inc.", level: "LOW", score: 34, conf: 74, d7: +1 },
-  MSFT: { ticker: "MSFT", name: "Microsoft Corp.", level: "LOW", score: 34, conf: 78, d7: +2 },
-  META: { ticker: "META", name: "Meta Platforms", level: "MEDIUM", score: 48, conf: 74, d7: +1 },
-  GOOGL: { ticker: "GOOGL", name: "Alphabet Inc.", level: "LOW", score: 33, conf: 77, d7: +1 },
+  NVDA: { ticker: "NVDA", name: "NVIDIA Corp.", level: "HIGH", score: 85, conf: 79, d7: 9 },
+  AMZN: { ticker: "AMZN", name: "Amazon.com, Inc.", level: "LOW", score: 34, conf: 74, d7: 1 },
+  MSFT: { ticker: "MSFT", name: "Microsoft Corp.", level: "LOW", score: 34, conf: 78, d7: 2 },
+  META: { ticker: "META", name: "Meta Platforms", level: "MEDIUM", score: 48, conf: 74, d7: 1 },
+  GOOGL: { ticker: "GOOGL", name: "Alphabet Inc.", level: "LOW", score: 33, conf: 77, d7: 1 },
 
   "300750.SZ": { ticker: "300750.SZ", name: "CATL", level: "LOW", score: 35, conf: 76, d7: -7 },
   "002594.SZ": { ticker: "002594.SZ", name: "BYD", level: "LOW", score: 35, conf: 76, d7: -7 },
@@ -240,6 +240,18 @@ let watchlist = ["AAPL", "300750.SZ", "600519.SS", "TSLA", "NVDA"];
 let compareList = ["AAPL", "300750.SZ", "600519.SS"];
 
 // ----- Helpers -----
+function clamp(n, min, max) {
+  const v = Number(n);
+  if (!Number.isFinite(v)) return min;
+  return Math.min(max, Math.max(min, v));
+}
+
+function avg(arr) {
+  const nums = (arr || []).filter(v => Number.isFinite(v));
+  if (!nums.length) return 0;
+  return nums.reduce((a, b) => a + b, 0) / nums.length;
+}
+
 function levelToBadgeClass(level) {
   if (level === "HIGH") return "high";
   if (level === "MEDIUM") return "medium";
@@ -252,8 +264,17 @@ function levelToText(level) {
     : (level === "HIGH" ? "High" : level === "MEDIUM" ? "Medium" : "Low");
 }
 
+function deriveLevelFromScore(score) {
+  return score >= 70 ? "HIGH" : score >= 40 ? "MEDIUM" : "LOW";
+}
+
 function fmt7d(n) {
   return `${n >= 0 ? "+" : ""}${n}`;
+}
+
+function fmtSignedPct(n, digits = 1) {
+  const v = Number(n) || 0;
+  return `${v >= 0 ? "+" : ""}${v.toFixed(digits)}%`;
 }
 
 function ensureUnique(arr) {
@@ -330,6 +351,334 @@ function applyTheme(theme) {
   }
 
   localStorage.setItem("theme", theme);
+}
+
+function pctChange(base, latest) {
+  const b = Number(base);
+  const l = Number(latest);
+  if (!Number.isFinite(b) || !Number.isFinite(l) || b === 0) return 0;
+  return ((l - b) / b) * 100;
+}
+
+function varianceSample(arr) {
+  const nums = (arr || []).filter(v => Number.isFinite(v));
+  if (nums.length < 2) return 0;
+  const mean = avg(nums);
+  return nums.reduce((acc, v) => acc + (v - mean) * (v - mean), 0) / (nums.length - 1);
+}
+
+function annualizedVolPct(returns) {
+  const nums = (returns || []).filter(v => Number.isFinite(v));
+  if (nums.length < 2) return 0;
+  return Math.sqrt(Math.max(varianceSample(nums), 0)) * Math.sqrt(252) * 100;
+}
+
+function calcMaxDrawdownPct(closes) {
+  const nums = (closes || []).filter(v => Number.isFinite(v));
+  if (!nums.length) return 0;
+
+  let peak = nums[0];
+  let mdd = 0;
+
+  for (const p of nums) {
+    if (p > peak) peak = p;
+    const dd = ((p / peak) - 1) * 100;
+    if (dd < mdd) mdd = dd;
+  }
+
+  return Number(mdd.toFixed(1));
+}
+
+function normalizeBreakdown(raw) {
+  const data = {
+    market: Math.max(1, Number(raw.market) || 1),
+    drawdown: Math.max(1, Number(raw.drawdown) || 1),
+    vol: Math.max(1, Number(raw.vol) || 1),
+    liq: Math.max(1, Number(raw.liq) || 1)
+  };
+
+  const total = data.market + data.drawdown + data.vol + data.liq;
+  let out = {
+    market: Math.round((data.market / total) * 100),
+    drawdown: Math.round((data.drawdown / total) * 100),
+    vol: Math.round((data.vol / total) * 100),
+    liq: Math.round((data.liq / total) * 100)
+  };
+
+  let diff = 100 - (out.market + out.drawdown + out.vol + out.liq);
+  if (diff !== 0) {
+    const keys = Object.keys(out).sort((a, b) => out[b] - out[a]);
+    out[keys[0]] += diff;
+  }
+
+  return out;
+}
+
+function computeConfidenceFromHistory(len, metrics) {
+  let conf = 66;
+
+  if (len >= 20) conf += 4;
+  if (len >= 60) conf += 4;
+  if (len >= 120) conf += 4;
+
+  if ((metrics?.vol20 || 0) <= 35) conf += 3;
+  if ((metrics?.vol20 || 0) >= 55) conf -= 3;
+  if (Math.abs(metrics?.mdd6m || 0) >= 25) conf -= 2;
+  if (Math.abs(metrics?.volChgPct || 0) <= 20) conf += 2;
+
+  return Math.round(clamp(conf, 60, 92));
+}
+
+function buildDriversFromMetrics(metrics, level, lang) {
+  const vol20 = Number(metrics?.vol20 || 0);
+  const vol60 = Number(metrics?.vol60 || 0);
+  const mdd6m = Number(metrics?.mdd6m || 0);
+  const beta = Number(metrics?.beta || 1);
+  const negDays20 = Number(metrics?.negDays20 || 0);
+  const volChgPct = Number(metrics?.volChgPct || 0);
+  const momentum20 = Number(metrics?.momentum20 || 0);
+
+  if (lang === "zh") {
+    return [
+      `近20日年化波动率约 ${Math.round(vol20)}%，${vol20 > vol60 ? "短期波动高于中期" : "短期波动低于或接近中期"}。`,
+      `近6个月最大回撤约 ${mdd6m.toFixed(1)}%，${Math.abs(mdd6m) > 25 ? "回撤压力较高" : Math.abs(mdd6m) > 12 ? "回撤压力中等" : "回撤压力较低"}。`,
+      `最近20个交易日中有 ${negDays20} 天为负收益，${negDays20 > 11 ? "短期情绪偏弱" : negDays20 > 8 ? "短期信号较混合" : "短期表现较稳"}。`,
+      `Beta 约为 ${beta.toFixed(2)}，${beta > 1.4 ? "对大盘更敏感" : beta > 1.0 ? "对大盘敏感度中等" : "对大盘敏感度较低"}。`,
+      `近10日成交量较前10日${volChgPct >= 0 ? "增加" : "减少"} ${Math.abs(volChgPct).toFixed(0)}%，${Math.abs(volChgPct) > 25 ? "流动性变化较明显" : "流动性相对平稳"}。`,
+      `近20日价格动量为 ${fmtSignedPct(momentum20, 1)}，${level === "HIGH" ? "风险信号偏高" : level === "MEDIUM" ? "风险信号中性" : "风险信号偏低"}。`
+    ];
+  }
+
+  return [
+    `20D annualized volatility is about ${Math.round(vol20)}%, ${vol20 > vol60 ? "higher than 60D" : "below or close to 60D"}.`,
+    `6M max drawdown is about ${mdd6m.toFixed(1)}%, ${Math.abs(mdd6m) > 25 ? "showing elevated drawdown pressure" : Math.abs(mdd6m) > 12 ? "showing moderate drawdown pressure" : "showing limited drawdown pressure"}.`,
+    `There were ${negDays20} negative-return days in the last 20 sessions, ${negDays20 > 11 ? "suggesting weaker short-term sentiment" : negDays20 > 8 ? "showing mixed short-term signals" : "showing steadier short-term behavior"}.`,
+    `Beta is around ${beta.toFixed(2)}, ${beta > 1.4 ? "indicating higher market sensitivity" : beta > 1.0 ? "indicating moderate market sensitivity" : "indicating lower market sensitivity"}.`,
+    `Volume ${volChgPct >= 0 ? "increased" : "decreased"} by ${Math.abs(volChgPct).toFixed(0)}% versus the prior 10 sessions, ${Math.abs(volChgPct) > 25 ? "so liquidity conditions changed clearly" : "so liquidity remains relatively stable"}.`,
+    `20D price momentum is ${fmtSignedPct(momentum20, 1)}, ${level === "HIGH" ? "which supports a higher risk reading" : level === "MEDIUM" ? "which keeps the signal mixed" : "which supports a lower risk reading"}.`
+  ];
+}
+
+function buildDefaultMetricsFromSeed(score, d7) {
+  const s = Number(score) || 35;
+  const d = Number(d7) || 0;
+
+  const vol20 = clamp(18 + s * 0.45, 16, 68);
+  const vol60 = clamp(vol20 - 6 + (d < 0 ? 2 : -1), 14, 64);
+  const mdd6m = -clamp(5 + s * 0.27, 5, 35);
+  const beta = clamp(0.72 + s / 62, 0.70, 2.10);
+  const volChgPct = clamp(d * 2.2, -60, 60);
+  const negDays20 = clamp(Math.round(6 + s / 8), 4, 15);
+  const momentum20 = clamp(d * 1.8, -25, 25);
+
+  const raw = {
+    market: clamp(beta * 22, 8, 90),
+    drawdown: clamp(Math.abs(mdd6m) * 2.2, 8, 90),
+    vol: clamp(vol20 * 1.5, 8, 90),
+    liq: clamp(Math.abs(volChgPct) * 0.9 + 10, 8, 60)
+  };
+
+  return {
+    vol20: Number(vol20.toFixed(1)),
+    vol60: Number(vol60.toFixed(1)),
+    mdd6m: Number(mdd6m.toFixed(1)),
+    beta: Number(beta.toFixed(2)),
+    volChgPct: Number(volChgPct.toFixed(1)),
+    negDays20,
+    momentum20: Number(momentum20.toFixed(1)),
+    eventRisk: Math.round(clamp(30 + s * 0.45, 20, 90)),
+    breakdown: normalizeBreakdown(raw),
+    hasVolume: false
+  };
+}
+
+function buildDynamicAnalyticsFromHistory(series, fallbackD7 = 0) {
+  const points = Array.isArray(series) ? series : [];
+
+  const closes = points
+    .map(p => Number(p.close))
+    .filter(v => Number.isFinite(v));
+
+  const volumes = points
+    .map(p => Number(p.volume ?? p.v))
+    .filter(v => Number.isFinite(v));
+
+  const returns = [];
+  for (let i = 1; i < closes.length; i++) {
+    const prev = closes[i - 1];
+    const now = closes[i];
+    if (Number.isFinite(prev) && Number.isFinite(now) && prev !== 0) {
+      returns.push((now / prev) - 1);
+    }
+  }
+
+  const ret20 = returns.slice(-20);
+  const ret60 = returns.slice(-60);
+  const vol20 = annualizedVolPct(ret20);
+  const vol60 = annualizedVolPct(ret60);
+
+  const mdd6m = calcMaxDrawdownPct(closes.slice(-126));
+  const negDays20 = ret20.filter(r => r < 0).length;
+
+  const momentum20 = closes.length >= 21
+    ? pctChange(closes[closes.length - 21], closes[closes.length - 1])
+    : Number(fallbackD7) || 0;
+
+  let hasVolume = false;
+  let volChgPct = clamp((Number(fallbackD7) || 0) * 2, -60, 60);
+
+  if (volumes.length >= 20) {
+    const prev10 = avg(volumes.slice(-20, -10));
+    const last10 = avg(volumes.slice(-10));
+    if (Number.isFinite(prev10) && Number.isFinite(last10) && prev10 !== 0) {
+      volChgPct = pctChange(prev10, last10);
+      hasVolume = true;
+    }
+  }
+
+  const beta = clamp(0.65 + (vol60 / 35), 0.65, 2.20);
+
+  const marketRaw = clamp(((beta - 0.65) / 1.55) * 100 + (momentum20 < 0 ? Math.min(18, Math.abs(momentum20) * 0.8) : 0), 6, 100);
+  const drawdownRaw = clamp((Math.abs(mdd6m) / 30) * 100, 6, 100);
+  const volRaw = clamp((((vol20 * 0.6) + (vol60 * 0.4)) / 50) * 100, 6, 100);
+  const liqRaw = hasVolume
+    ? clamp((Math.abs(volChgPct) / 100) * 100, 6, 65)
+    : clamp((Math.abs(volChgPct) / 80) * 100, 6, 45);
+
+  return {
+    vol20: Number(vol20.toFixed(1)),
+    vol60: Number(vol60.toFixed(1)),
+    mdd6m: Number(mdd6m.toFixed(1)),
+    beta: Number(beta.toFixed(2)),
+    volChgPct: Number(volChgPct.toFixed(1)),
+    negDays20,
+    momentum20: Number(momentum20.toFixed(1)),
+    eventRisk: Math.round(clamp((negDays20 / 20) * 100 + (momentum20 < 0 ? Math.min(20, Math.abs(momentum20)) : 0), 10, 90)),
+    breakdown: normalizeBreakdown({
+      market: marketRaw,
+      drawdown: drawdownRaw,
+      vol: volRaw,
+      liq: liqRaw
+    }),
+    hasVolume
+  };
+}
+
+function updateTextCandidates(candidates, value) {
+  for (const key of candidates) {
+    const byId = document.getElementById(key);
+    if (byId) {
+      byId.textContent = value;
+      return true;
+    }
+
+    const byDataBind = document.querySelector(`[data-bind="${key}"]`);
+    if (byDataBind) {
+      byDataBind.textContent = value;
+      return true;
+    }
+  }
+  return false;
+}
+
+function renderDriversPanel(pred) {
+  const drivers = Array.isArray(pred?.drivers) ? pred.drivers : [];
+
+  // Existing fixed slots
+  ["d1", "d2", "d3", "d4", "d5", "d6"].forEach((id, idx) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = drivers[idx] || "";
+  });
+
+  // Optional dynamic container
+  const wrap = document.getElementById("s2DriversList") || document.getElementById("driversList");
+  if (wrap) {
+    wrap.innerHTML = drivers.map((txt, idx) => `
+      <div class="driver-item" id="auto-driver-${idx + 1}">
+        ${escapeHtml(txt)}
+      </div>
+    `).join("");
+  }
+}
+
+function renderBreakdownAndMetrics(pred) {
+  const bd = pred?.metrics?.breakdown || pred?.breakdown || { market: 35, drawdown: 30, vol: 25, liq: 10 };
+  const m = pred?.metrics || {};
+
+  const marketTxt = `${Math.round(bd.market)}%`;
+  const drawdownTxt = `${Math.round(bd.drawdown)}%`;
+  const volTxt = `${Math.round(bd.vol)}%`;
+  const liqTxt = `${Math.round(bd.liq)}%`;
+
+  const vol20Txt = `${Math.round(Number(m.vol20 || 0))}%`;
+  const vol60Txt = `${Math.round(Number(m.vol60 || 0))}%`;
+  const mddTxt = `${Number(m.mdd6m || 0).toFixed(1)}%`;
+  const betaTxt = Number(m.beta || 0).toFixed(2);
+  const volChgTxt = `${Number(m.volChgPct || 0) >= 0 ? "↑" : "↓"} ${Math.abs(Number(m.volChgPct || 0)).toFixed(0)}%`;
+
+  updateTextCandidates(["bdMarketVal", "bdMarketValue", "breakdownMarket", "marketRiskValue"], marketTxt);
+  updateTextCandidates(["bdDrawdownVal", "bdDrawdownValue", "breakdownDrawdown", "drawdownRiskValue"], drawdownTxt);
+  updateTextCandidates(["bdVolVal", "bdVolValue", "breakdownVol", "volRiskValue"], volTxt);
+  updateTextCandidates(["bdLiqVal", "bdLiqValue", "breakdownLiquidity", "liqRiskValue"], liqTxt);
+
+  updateTextCandidates(["metricVol20Val", "metric20Vol", "vol20Value"], vol20Txt);
+  updateTextCandidates(["metricVol60Val", "metric60Vol", "vol60Value"], vol60Txt);
+  updateTextCandidates(["metricMdd6mVal", "metricMddVal", "mdd6mValue"], mddTxt);
+  updateTextCandidates(["metricBetaVal", "metricBeta", "betaValue"], betaTxt);
+  updateTextCandidates(["metricVolChgVal", "metricVolumeChange", "volChgValue"], volChgTxt);
+
+  const breakdownWrap = document.getElementById("s2BreakdownList") || document.getElementById("breakdownList");
+  if (breakdownWrap) {
+    breakdownWrap.innerHTML = `
+      <div class="kv-row"><span>${I18N[currentLang].bd_market}</span><span>${marketTxt}</span></div>
+      <div class="kv-row"><span>${I18N[currentLang].bd_drawdown}</span><span>${drawdownTxt}</span></div>
+      <div class="kv-row"><span>${I18N[currentLang].bd_vol}</span><span>${volTxt}</span></div>
+      <div class="kv-row"><span>${I18N[currentLang].bd_liq}</span><span>${liqTxt}</span></div>
+    `;
+  }
+
+  const metricsWrap = document.getElementById("s2MetricsList") || document.getElementById("metricsList");
+  if (metricsWrap) {
+    metricsWrap.innerHTML = `
+      <div class="kv-row"><span>20D vol</span><span>${vol20Txt}</span></div>
+      <div class="kv-row"><span>60D vol</span><span>${vol60Txt}</span></div>
+      <div class="kv-row"><span>6M MDD</span><span>${mddTxt}</span></div>
+      <div class="kv-row"><span>Beta</span><span>${betaTxt}</span></div>
+      <div class="kv-row"><span>${I18N[currentLang].metric_volchg}</span><span>${volChgTxt}</span></div>
+    `;
+  }
+
+  const rulesWrap = document.getElementById("s2RulesList") || document.getElementById("rulesList");
+  if (rulesWrap) {
+    rulesWrap.innerHTML = `
+      <li><b>${I18N[currentLang].rule_high}:</b> ${currentLang === "zh" ? "未来30天回撤 > 12%" : "forward 30D drawdown > 12%"}</li>
+      <li><b>${I18N[currentLang].rule_medium}:</b> ${currentLang === "zh" ? "6% - 12%" : "6% - 12%"}</li>
+      <li><b>${I18N[currentLang].rule_low}:</b> ${currentLang === "zh" ? "< 6%" : "< 6%"}</li>
+    `;
+  }
+}
+
+function buildSummaryText(pred) {
+  const vol20 = Number(pred?.metrics?.vol20 || 0);
+  const mdd6m = Number(pred?.metrics?.mdd6m || 0);
+
+  if (currentLang === "zh") {
+    if (pred.level === "HIGH") {
+      return `短期风险较高（20日波动约 ${Math.round(vol20)}%，6个月回撤约 ${mdd6m.toFixed(1)}%）。`;
+    }
+    if (pred.level === "MEDIUM") {
+      return `短期风险中等（波动与回撤信号较混合，20日波动约 ${Math.round(vol20)}%）。`;
+    }
+    return `短期风险较低（近阶段相对稳定，20日波动约 ${Math.round(vol20)}%，回撤约 ${mdd6m.toFixed(1)}%）。`;
+  }
+
+  if (pred.level === "HIGH") {
+    return `Higher short-term risk (20D vol about ${Math.round(vol20)}%, 6M drawdown about ${mdd6m.toFixed(1)}%).`;
+  }
+  if (pred.level === "MEDIUM") {
+    return `Moderate short-term risk with mixed volatility and drawdown signals (20D vol about ${Math.round(vol20)}%).`;
+  }
+  return `Lower short-term risk with relatively steadier recent behavior (20D vol about ${Math.round(vol20)}%, drawdown about ${mdd6m.toFixed(1)}%).`;
 }
 
 // ----- Data fetch -----
@@ -567,31 +916,14 @@ function renderCompareTrend() {
 function predictRisk(ticker) {
   ticker = (ticker || "").trim().toUpperCase();
 
-  const baseScore = 35;
-  const conf = 76;
-  const d7 = -7;
-  const level = baseScore >= 70 ? "HIGH" : baseScore >= 40 ? "MEDIUM" : "LOW";
+  const base = STOCKS[ticker] || {};
+  const baseScore = Number(base.score ?? 35);
+  const conf = Number(base.conf ?? 76);
+  const d7 = Number(base.d7 ?? -7);
+  const level = base.level || deriveLevelFromScore(baseScore);
 
   const rules = { high: 12, medLo: 6, medHi: 12, low: 6 };
-  const metrics = { vol20: 48, vol60: 39, mdd6m: -28, beta: "1.62", volChg: d7 >= 0 ? "↑" : "↓" };
-
-  const driversEN = [
-    `20/60-day volatility is ${level === "LOW" ? "stable" : "rising"}.`,
-    `Max drawdown is ${level === "HIGH" ? "widening" : "moderate"}.`,
-    `${level === "LOW" ? "Fewer" : "More"} negative-return days recently.`,
-    `Beta is ${level === "HIGH" ? "high" : level === "MEDIUM" ? "moderate" : "lower"} (market sensitivity).`,
-    `Liquidity is healthy, which affects swings.`,
-    `Sentiment / event risk is ${level === "HIGH" ? "increased" : "neutral"}.`,
-  ];
-
-  const driversZH = [
-    `近20/60日波动率${level === "LOW" ? "较稳定" : "上升"}。`,
-    `最大回撤${level === "HIGH" ? "扩大" : "处于中等水平"}。`,
-    `近期${level === "LOW" ? "负收益天数更少" : "负收益天数更多"}。`,
-    `Beta${level === "HIGH" ? "偏高" : level === "MEDIUM" ? "中等" : "较低"}（对大盘敏感度）。`,
-    `流动性较好，会影响波动。`,
-    `情绪/事件风险${level === "HIGH" ? "上升" : "较中性"}。`,
-  ];
+  const metrics = buildDefaultMetricsFromSeed(baseScore, d7);
 
   return {
     ticker,
@@ -602,7 +934,8 @@ function predictRisk(ticker) {
     level,
     rules,
     metrics,
-    drivers: currentLang === "zh" ? driversZH : driversEN,
+    breakdown: metrics.breakdown,
+    drivers: buildDriversFromMetrics(metrics, level, currentLang),
     series: Array(20).fill(baseScore),
     xMeta: null
   };
@@ -632,7 +965,7 @@ async function predictRiskOnline(ticker, range) {
     if (closes.length >= 3) {
       pred.series = computeRiskSeriesFromCloses(closes);
       pred.score = pred.series[pred.series.length - 1];
-      pred.level = pred.score >= 70 ? "HIGH" : pred.score >= 40 ? "MEDIUM" : "LOW";
+      pred.level = deriveLevelFromScore(pred.score);
 
       const lastIdx = closes.length - 1;
       const baseIdx = Math.max(0, lastIdx - 5);
@@ -647,9 +980,21 @@ async function predictRiskOnline(ticker, range) {
         start: hist.series?.[0]?.t,
         end: hist.series?.[hist.series.length - 1]?.t
       };
+
+      pred.metrics = buildDynamicAnalyticsFromHistory(hist.series || [], pred.d7);
+      pred.breakdown = pred.metrics.breakdown;
+      pred.conf = computeConfidenceFromHistory(closes.length, pred.metrics);
+      pred.drivers = buildDriversFromMetrics(pred.metrics, pred.level, currentLang);
+    } else {
+      pred.metrics = buildDefaultMetricsFromSeed(pred.score, pred.d7);
+      pred.breakdown = pred.metrics.breakdown;
+      pred.drivers = buildDriversFromMetrics(pred.metrics, pred.level, currentLang);
     }
   } catch (e) {
     console.warn("Online history failed:", e?.message || e);
+    pred.metrics = buildDefaultMetricsFromSeed(pred.score, pred.d7);
+    pred.breakdown = pred.metrics.breakdown;
+    pred.drivers = buildDriversFromMetrics(pred.metrics, pred.level, currentLang);
   }
 
   return pred;
@@ -710,12 +1055,7 @@ function applyPrediction(pred) {
 
   const s1Explain = document.getElementById("s1Explain");
   if (s1Explain) {
-    s1Explain.textContent =
-      pred.level === "HIGH"
-        ? (currentLang === "zh" ? "短期风险较高（波动与回撤偏大）。" : "Higher short-term risk (volatility/drawdown elevated).")
-        : pred.level === "MEDIUM"
-        ? (currentLang === "zh" ? "短期风险中等（信号较混合）。" : "Moderate short-term risk with mixed signals.")
-        : (currentLang === "zh" ? "短期风险较低（相对稳定）。" : "Lower short-term risk with more stability.");
+    s1Explain.textContent = buildSummaryText(pred);
   }
 
   const s2HeaderStock = document.getElementById("s2HeaderStock");
@@ -743,16 +1083,20 @@ function applyPrediction(pred) {
   if (s2Meaning) {
     s2Meaning.textContent =
       pred.level === "HIGH"
-        ? (currentLang === "zh" ? "该股票短期下行风险较高，请谨慎参考。" : "This stock shows higher downside risk in the next period.")
+        ? (currentLang === "zh"
+            ? `该股票短期下行风险较高，主要受波动与回撤压力影响。`
+            : `This stock shows higher downside risk in the near term, mainly driven by volatility and drawdown pressure.`)
         : pred.level === "MEDIUM"
-        ? (currentLang === "zh" ? "该股票风险中等，建议结合更多信息判断。" : "This stock shows moderate risk with mixed short-term signals.")
-        : (currentLang === "zh" ? "该股票风险较低，但仍需关注市场变化。" : "This stock shows lower risk based on recent stability.");
+        ? (currentLang === "zh"
+            ? `该股票风险中等，短期信号较混合，建议结合更多信息判断。`
+            : `This stock shows moderate risk with mixed short-term signals.`)
+        : (currentLang === "zh"
+            ? `该股票风险较低，近期表现相对稳定，但仍需关注市场变化。`
+            : `This stock shows lower risk based on recent stability.`);
   }
 
-  ["d1", "d2", "d3", "d4", "d5", "d6"].forEach((id, idx) => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = pred.drivers[idx] || "";
-  });
+  renderDriversPanel(pred);
+  renderBreakdownAndMetrics(pred);
 
   const s1RangeLabel = document.getElementById("s1RangeLabel");
   if (s1RangeLabel) s1RangeLabel.textContent = `${currentLang === "zh" ? "范围：" : "Range: "}${currentRange}`;
@@ -837,7 +1181,7 @@ function renderWatchlist() {
       </div>
 
       <div class="w-mid">
-        <div><span class="muted">Score:</span> <b>${safeText(s.score, 0)}</b></div>
+        <div><span class="muted">${currentLang === "zh" ? "评分" : "Score"}:</span> <b>${safeText(s.score, 0)}</b></div>
         <div><span class="muted">7D:</span> <b class="num ${d7Class}">${fmt7d(s.d7)}</b></div>
       </div>
 
@@ -967,6 +1311,10 @@ async function buildReportPreview(ticker, rangeOverride = currentRange) {
         <b>3) Metrics & Rules</b>
         <div class="muted">
           Rules: High &gt; ${pred.rules.high}%, Medium ${pred.rules.medLo}%–${pred.rules.medHi}%, Low &lt; ${pred.rules.low}%
+          <br/>20D vol: ${Math.round(pred.metrics?.vol20 || 0)}%
+          <br/>60D vol: ${Math.round(pred.metrics?.vol60 || 0)}%
+          <br/>6M MDD: ${(pred.metrics?.mdd6m || 0).toFixed(1)}%
+          <br/>Beta: ${(pred.metrics?.beta || 0).toFixed(2)}
         </div>
       </div>
     `);

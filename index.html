@@ -36,7 +36,7 @@
             id="s1Search"
             class="input"
             data-i18n-placeholder="s1_placeholder"
-            placeholder="Enter ticker (e.g., AAPL, MSFT)"
+            placeholder="Enter ticker (e.g., AAPL, MSFT, 300750.SZ, 600519.SS)"
           />
           <button class="btn primary" id="s1PredictBtn" data-i18n="btn_predict">Predict Risk</button>
         </div>
@@ -164,7 +164,7 @@
 
         <div class="card">
           <h2 class="card-title" data-i18n="s2_drivers">Key Drivers</h2>
-          <div class="drivers">
+          <div class="drivers" id="s2DriversList">
             <div class="driver" id="d1"></div>
             <div class="driver" id="d2"></div>
             <div class="driver" id="d3"></div>
@@ -180,28 +180,44 @@
 
           <div class="subblock">
             <div class="sub-title" data-i18n="s2_breakdown">Risk Breakdown</div>
-            <div class="mini-grid">
-              <div data-i18n="bd_market">Market</div><div class="right"><span id="rbMarket">35%</span></div>
-              <div data-i18n="bd_drawdown">Drawdown</div><div class="right"><span id="rbDrawdown">30%</span></div>
-              <div data-i18n="bd_vol">Volatility</div><div class="right"><span id="rbVol">25%</span></div>
-              <div data-i18n="bd_liq">Liquidity</div><div class="right"><span id="rbLiq">10%</span></div>
+            <div class="mini-grid" id="s2BreakdownList">
+              <div data-i18n="bd_market">Market</div>
+              <div class="right"><span id="bdMarketVal">35%</span></div>
+
+              <div data-i18n="bd_drawdown">Drawdown</div>
+              <div class="right"><span id="bdDrawdownVal">30%</span></div>
+
+              <div data-i18n="bd_vol">Volatility</div>
+              <div class="right"><span id="bdVolVal">25%</span></div>
+
+              <div data-i18n="bd_liq">Liquidity</div>
+              <div class="right"><span id="bdLiqVal">10%</span></div>
             </div>
           </div>
 
           <div class="subblock">
             <div class="sub-title" data-i18n="s2_metrics">Key Metrics</div>
-            <div class="mini-grid">
-              <div>20D vol</div><div class="right"><span id="mVol20">48%</span></div>
-              <div>60D vol</div><div class="right"><span id="mVol60">39%</span></div>
-              <div>6M MDD</div><div class="right"><span id="mMDD6m">-28%</span></div>
-              <div>Beta</div><div class="right"><span id="mBeta">1.62</span></div>
-              <div data-i18n="metric_volchg">Volume change</div><div class="right"><span id="mVolChg" class="num pos">↑</span></div>
+            <div class="mini-grid" id="s2MetricsList">
+              <div>20D vol</div>
+              <div class="right"><span id="metricVol20Val">48%</span></div>
+
+              <div>60D vol</div>
+              <div class="right"><span id="metricVol60Val">39%</span></div>
+
+              <div>6M MDD</div>
+              <div class="right"><span id="metricMdd6mVal">-28%</span></div>
+
+              <div>Beta</div>
+              <div class="right"><span id="metricBetaVal">1.62</span></div>
+
+              <div data-i18n="metric_volchg">Volume change</div>
+              <div class="right"><span id="metricVolChgVal" class="num pos">↑ 0%</span></div>
             </div>
           </div>
 
           <div class="subblock">
             <div class="sub-title" data-i18n="s2_rules">Risk Label Rules</div>
-            <ul class="rules">
+            <ul class="rules" id="s2RulesList">
               <li><b data-i18n="rule_high">High</b>: <span data-i18n="rule_high_text">forward 30D drawdown</span> &gt; <span id="rHigh">12%</span></li>
               <li><b data-i18n="rule_medium">Medium</b>: <span id="rMedLo">6%</span> - <span id="rMedHi">12%</span></li>
               <li><b data-i18n="rule_low">Low</b>: &lt; <span id="rLow">6%</span></li>
