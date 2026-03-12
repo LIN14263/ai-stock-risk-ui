@@ -3,7 +3,6 @@
 // app.js
 // =====================
 
-// ----- i18n dictionary -----
 const I18N = {
   en: {
     app_title: "AI Stock Risk",
@@ -27,7 +26,8 @@ const I18N = {
     btn_view_details: "View Details",
     btn_generate_report: "Generate Report",
     s1_chart_title: "Risk Score Trend",
-    chart_note: "Line updates with prediction and time range.",
+    chart_note: "The line updates with prediction and selected time range.",
+    range_label: "Range:",
 
     s2_title: "S2 — Risk Score & Drivers",
     btn_back: "Back",
@@ -62,6 +62,8 @@ const I18N = {
     opt_medium: "Medium",
     opt_low: "Low",
     flow: "Flow:",
+    wl_flow_note: "S2 → Add to Watchlist → Watchlist → View Details → S2",
+    btn_remove: "Remove",
 
     cmp_title: "Compare",
     cmp_placeholder: "Add ticker (e.g., AAPL, 300750.SZ)",
@@ -71,6 +73,10 @@ const I18N = {
     cmp_note: "Click View Details to open S2.",
     cmp_chart: "Charts",
     cmp_chart_note: "Ranking and trend update automatically.",
+    cmp_rank_title: "Risk score ranking",
+    cmp_trend_title: "Risk trend",
+    axis_time: "Time",
+    axis_risk_score: "Risk Score",
 
     rep_title: "Reports",
     btn_gen_report: "Generate Report",
@@ -81,23 +87,31 @@ const I18N = {
     rep_metrics: "Metrics & Rules",
     rep_charts: "Charts",
     rep_disclaimer: "Disclaimer",
-    rep_note: "This prototype shows structure and export buttons (no real PDF).",
+    rep_note: "This prototype shows the structure and export buttons only (no real PDF export).",
     rep_preview: "Report Preview",
     rep_preview_hint: "Click Generate Report to preview.",
+    rep_exec: "Executive summary",
+    rep_rec: "Suggested action",
+    rep_report_for: "Report for:",
+    rep_notes: "Report Notes",
+    rep_quick: "Quick Summary",
+    rep_layout: "Layout Purpose",
+    rep_layout_text: "This layout fills the right side and makes the page look more complete and system-like.",
+    rep_chart_caption: "Mini risk trend chart",
 
     set_title: "Settings",
     btn_save: "Save Changes",
     set_display: "Display",
     set_theme: "Theme",
     theme_dark: "Dark",
-    theme_light: "Light (placeholder)",
+    theme_light: "Light",
     set_lang: "Language",
     set_lang_note: "Switch language instantly for UI text.",
     set_alerts: "Alerts",
     alerts_enable: "Enable alerts",
     alerts_score: "Notify if Risk Score >",
     alerts_high: "Notify if Risk Level = High",
-    alerts_note: "Works with Watchlist filtering and monitoring.",
+    alerts_note: "Used for watchlist filtering and monitoring.",
     set_data: "Data & Update",
     set_source: "Data source",
     source_price: "Price only",
@@ -107,7 +121,16 @@ const I18N = {
     freq_weekly: "Weekly",
     set_sync: "Last sync",
     btn_refresh: "Refresh Data",
+
+    level_high: "High",
+    level_medium: "Medium",
+    level_low: "Low",
+    latest: "Latest:",
+    start: "Start",
+    end: "End",
+    middle: "Middle"
   },
+
   zh: {
     app_title: "AI股票风险",
     app_sub: "UI原型（S1 / S2 / 观察列表）",
@@ -130,7 +153,8 @@ const I18N = {
     btn_view_details: "查看详情",
     btn_generate_report: "生成报告",
     s1_chart_title: "风险评分趋势",
-    chart_note: "折线会随预测和时间范围实时变化。",
+    chart_note: "折线会随预测结果和选择的时间范围实时变化。",
+    range_label: "范围：",
 
     s2_title: "S2 — 风险解释（评分与驱动因素）",
     btn_back: "返回",
@@ -165,59 +189,145 @@ const I18N = {
     opt_medium: "中",
     opt_low: "低",
     flow: "流程：",
+    wl_flow_note: "S2 → 加入观察 → 观察名单 → 查看详情 → S2",
+    btn_remove: "移除",
 
     cmp_title: "比较",
     cmp_placeholder: "添加股票代码（例如：AAPL、300750.SZ）",
     btn_add_stock: "添加",
     btn_gen_compare: "生成对比",
     cmp_table: "对比表",
-    cmp_note: "点击 View Details 打开S2。",
+    cmp_note: "点击“查看详情”打开 S2。",
     cmp_chart: "图表",
     cmp_chart_note: "排名和趋势会自动更新。",
+    cmp_rank_title: "风险评分排名",
+    cmp_trend_title: "风险趋势",
+    axis_time: "时间",
+    axis_risk_score: "风险评分",
 
     rep_title: "报告",
     btn_gen_report: "生成报告",
     btn_export_pdf: "导出PDF",
     rep_include: "包含部分",
     rep_summary: "风险总结",
-    rep_drivers: "驱动因素（前六名）",
+    rep_drivers: "驱动因素（前六项）",
     rep_metrics: "指标与规则",
     rep_charts: "图表",
     rep_disclaimer: "免责声明",
-    rep_note: "本原型展示结构与导出按钮（无真实PDF）。",
+    rep_note: "本原型展示结构和导出按钮（无真实 PDF 导出）。",
     rep_preview: "报告预览",
     rep_preview_hint: "点击“生成报告”以预览。",
+    rep_exec: "执行摘要",
+    rep_rec: "建议操作",
+    rep_report_for: "报告对象：",
+    rep_notes: "报告说明",
+    rep_quick: "快速摘要",
+    rep_layout: "布局目的",
+    rep_layout_text: "这样可以让右侧不再留白，同时让报告界面更完整、更像正式系统。",
+    rep_chart_caption: "迷你风险趋势图",
 
     set_title: "背景设定",
     btn_save: "保存更改",
     set_display: "展示",
     set_theme: "主题",
     theme_dark: "黑暗",
-    theme_light: "明亮（占位）",
+    theme_light: "明亮",
     set_lang: "语言",
     set_lang_note: "点击即可切换界面语言。",
     set_alerts: "提醒",
     alerts_enable: "启用提醒",
     alerts_score: "当风险评分 >",
-    alerts_high: "当风险等级=高时提醒",
+    alerts_high: "当风险等级 = 高时提醒",
     alerts_note: "用于观察列表的筛选与监控。",
     set_data: "数据与更新",
     set_source: "数据来源",
     source_price: "仅价格",
-    source_news: "价格+新闻（可选）",
+    source_news: "价格 + 新闻（可选）",
     set_freq: "更新频率",
     freq_daily: "每日",
     freq_weekly: "每周",
     set_sync: "最后同步",
     btn_refresh: "刷新数据",
+
+    level_high: "高",
+    level_medium: "中",
+    level_low: "低",
+    latest: "最新：",
+    start: "开始",
+    end: "结束",
+    middle: "中间"
   }
 };
+
+
+Object.assign(I18N.en, {
+  fc_title: "AI Forecast",
+  fc_days: "Forecast Days",
+  fc_generate: "Generate Forecast",
+  fc_export: "Export CSV",
+  fc_hint: "Forecast combines the second file's trend summary, direction, confidence, and key factors.",
+  fc_analysis: "Trend Analysis",
+  fc_outlook: "Forecast Outlook",
+  fc_conf: "Confidence",
+  fc_method: "Method",
+  fc_factors: "Key Factors",
+  fc_hist_title: "Historical Summary",
+  fc_loading: "Generating forecast...",
+  fc_error: "Forecast failed. Please try another ticker.",
+  fc_export_done: "Forecast CSV downloaded.",
+  fc_export_empty: "Generate a forecast first.",
+  fc_summary_start: "Start Price",
+  fc_summary_end: "End Price",
+  fc_summary_avg: "Average Price",
+  fc_summary_high: "Highest Price",
+  fc_summary_low: "Lowest Price",
+  fc_summary_change: "Price Change",
+  fc_summary_days: "Total Data Days",
+  fc_conf_high: "High",
+  fc_conf_medium: "Medium",
+  fc_conf_low: "Low"
+});
+
+Object.assign(I18N.zh, {
+  fc_title: "AI 预测",
+  fc_days: "预测天数",
+  fc_generate: "生成预测",
+  fc_export: "导出 CSV",
+  fc_hint: "这里整合了第二个文件的趋势总结、方向判断、置信度和关键因素。",
+  fc_analysis: "趋势分析",
+  fc_outlook: "预测结果",
+  fc_conf: "置信度",
+  fc_method: "方法",
+  fc_factors: "关键因素",
+  fc_hist_title: "历史摘要",
+  fc_loading: "正在生成预测...",
+  fc_error: "预测失败，请尝试其他股票代码。",
+  fc_export_done: "预测 CSV 已下载。",
+  fc_export_empty: "请先生成预测。",
+  fc_summary_start: "起始价格",
+  fc_summary_end: "结束价格",
+  fc_summary_avg: "平均价格",
+  fc_summary_high: "最高价格",
+  fc_summary_low: "最低价格",
+  fc_summary_change: "价格变动",
+  fc_summary_days: "数据天数",
+  fc_conf_high: "高",
+  fc_conf_medium: "中",
+  fc_conf_low: "低"
+});
 
 let currentLang = "en";
 let currentRange = "1M";
 let autoRefreshTimer = null;
+let searchPreviewTimer = null;
+let selectedTicker = "AAPL";
+let currentForecastDays = 7;
+let lastForecastResult = null;
+let lastFetchedHistoryMeta = null;
+const FORCE_LOCAL_DEMO_HISTORY = true;
+let watchlist = ["AAPL", "300750.SZ", "600519.SS", "TSLA", "NVDA"];
+let compareList = ["AAPL", "300750.SZ", "600519.SS"];
 
-// ----- Stock seed data -----
 const STOCKS = {
   AAPL: { ticker: "AAPL", name: "Apple Inc.", level: "LOW", score: 35, conf: 76, d7: -7 },
   TSLA: { ticker: "TSLA", name: "Tesla, Inc.", level: "MEDIUM", score: 62, conf: 69, d7: -3 },
@@ -235,11 +345,63 @@ const STOCKS = {
   "600036.SS": { ticker: "600036.SS", name: "China Merchants Bank", level: "LOW", score: 35, conf: 76, d7: -7 }
 };
 
-let selectedTicker = "AAPL";
-let watchlist = ["AAPL", "300750.SZ", "600519.SS", "TSLA", "NVDA"];
-let compareList = ["AAPL", "300750.SZ", "600519.SS"];
+function tickerBaseName(ticker) {
+  return String(ticker || "").trim().toUpperCase().replace(/[.\-].*$/, "");
+}
 
-// ----- Helpers -----
+function getTickerProfile(ticker) {
+  const clean = String(ticker || "DEMO").trim().toUpperCase() || "DEMO";
+  const seed = hashTickerSeed(`profile:${clean}`);
+  const suffix = clean.includes('.SZ') || clean.includes('.SS') ? 'CN' : 'US';
+  const baseMap = {
+    AAPL: 180,
+    MSFT: 420,
+    NVDA: 920,
+    TSLA: 210,
+    AMZN: 175,
+    META: 485,
+    GOOGL: 170,
+    DEMO: 120,
+  };
+  const baseKey = tickerBaseName(clean);
+  const basePrice = baseMap[baseKey] || (suffix === 'CN' ? 95 + (seed % 180) : 70 + (seed % 260));
+  const trendTilt = (((seed >> 4) % 200) - 100) / 100;
+  const volTilt = 0.007 + (((seed >> 9) % 11) / 1000);
+  const curvePhase = (seed % 360) * Math.PI / 180;
+  const sectorWave = 0.004 + (((seed >> 14) % 10) / 1500);
+  return { clean, seed, suffix, basePrice, trendTilt, volTilt, curvePhase, sectorWave };
+}
+
+function getRangeConfig(range) {
+  if (range === '1M') return { points: 26, dayStep: 1, trendScale: 0.55, noiseScale: 1.05, cycle1: 6, cycle2: 11, shockScale: 0.014 };
+  if (range === '3M') return { points: 46, dayStep: 2, trendScale: 0.85, noiseScale: 0.95, cycle1: 10, cycle2: 18, shockScale: 0.017 };
+  if (range === '6M') return { points: 68, dayStep: 3, trendScale: 1.05, noiseScale: 0.9, cycle1: 14, cycle2: 22, shockScale: 0.02 };
+  if (range === '1Y') return { points: 96, dayStep: 4, trendScale: 1.2, noiseScale: 0.84, cycle1: 16, cycle2: 28, shockScale: 0.024 };
+  return { points: 132, dayStep: 8, trendScale: 1.45, noiseScale: 0.78, cycle1: 20, cycle2: 36, shockScale: 0.028 };
+}
+
+function buildShockMap(points, seed, scale) {
+  const shockMap = new Map();
+  const shockCount = 2 + (seed % 2);
+  for (let i = 0; i < shockCount; i++) {
+    const pos = Math.max(3, Math.min(points - 4, Math.floor(((seed >> (i * 3 + 2)) % (points - 6)) + 3)));
+    const sign = ((seed >> (i * 5 + 1)) & 1) ? 1 : -1;
+    const amp = scale * (0.7 + (((seed >> (i * 7 + 4)) % 7) / 10));
+    shockMap.set(pos, (shockMap.get(pos) || 0) + sign * amp);
+  }
+  return shockMap;
+}
+
+function buildPreviewTickerLabel(ticker, range) {
+  const up = String(ticker || selectedTicker || 'AAPL').toUpperCase();
+  if (currentLang === 'zh') return `${up} 历史走势 + 预测（${range}）`;
+  return `${up} history + forecast (${range})`;
+}
+
+function t(key) {
+  return I18N[currentLang][key] || key;
+}
+
 function clamp(n, min, max) {
   const v = Number(n);
   if (!Number.isFinite(v)) return min;
@@ -250,107 +412,6 @@ function avg(arr) {
   const nums = (arr || []).filter(v => Number.isFinite(v));
   if (!nums.length) return 0;
   return nums.reduce((a, b) => a + b, 0) / nums.length;
-}
-
-function levelToBadgeClass(level) {
-  if (level === "HIGH") return "high";
-  if (level === "MEDIUM") return "medium";
-  return "low";
-}
-
-function levelToText(level) {
-  return currentLang === "zh"
-    ? (level === "HIGH" ? "高" : level === "MEDIUM" ? "中" : "低")
-    : (level === "HIGH" ? "High" : level === "MEDIUM" ? "Medium" : "Low");
-}
-
-function deriveLevelFromScore(score) {
-  return score >= 70 ? "HIGH" : score >= 40 ? "MEDIUM" : "LOW";
-}
-
-function fmt7d(n) {
-  return `${n >= 0 ? "+" : ""}${n}`;
-}
-
-function fmtSignedPct(n, digits = 1) {
-  const v = Number(n) || 0;
-  return `${v >= 0 ? "+" : ""}${v.toFixed(digits)}%`;
-}
-
-function ensureUnique(arr) {
-  return [...new Set(arr)];
-}
-
-function setNumColor(el, n) {
-  if (!el) return;
-  el.classList.remove("pos", "neg", "neu");
-  if (n > 0) el.classList.add("pos");
-  else if (n < 0) el.classList.add("neg");
-  else el.classList.add("neu");
-}
-
-function fmtDateShort(iso) {
-  if (!iso) return "";
-  return String(iso).slice(0, 10);
-}
-
-function safeText(v, fallback = "-") {
-  if (v === null || v === undefined || v === "") return fallback;
-  return String(v);
-}
-
-function getCompareXLabels(range) {
-  if (currentLang === "zh") {
-    if (range === "1M") return { start: "1个月前", mid: "中间", end: "现在" };
-    if (range === "3M") return { start: "3个月前", mid: "中间", end: "现在" };
-    if (range === "6M") return { start: "6个月前", mid: "中间", end: "现在" };
-    if (range === "1Y") return { start: "1年前", mid: "中间", end: "现在" };
-    if (range === "3Y") return { start: "3年前", mid: "中间", end: "现在" };
-    return { start: "开始", mid: "中间", end: "结束" };
-  }
-
-  if (range === "1M") return { start: "1M Ago", mid: "Middle", end: "Now" };
-  if (range === "3M") return { start: "3M Ago", mid: "Middle", end: "Now" };
-  if (range === "6M") return { start: "6M Ago", mid: "Middle", end: "Now" };
-  if (range === "1Y") return { start: "1Y Ago", mid: "Middle", end: "Now" };
-  if (range === "3Y") return { start: "3Y Ago", mid: "Middle", end: "Now" };
-  return { start: "Start", mid: "Middle", end: "End" };
-}
-
-function buildCompareSeries(stock) {
-  const base = Number(stock.score) || 0;
-  const d7 = Number(stock.d7) || 0;
-
-  const series = [
-    Math.max(0, base - 8),
-    Math.max(0, base - 5),
-    Math.max(0, base - 2),
-    Math.max(0, Math.min(100, base + Math.round(d7 / 2))),
-    Math.max(0, Math.min(100, base))
-  ];
-
-  return series.map(v => Math.max(0, Math.min(100, v)));
-}
-
-function escapeHtml(str) {
-  return String(str)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}
-
-function applyTheme(theme) {
-  document.body.classList.remove("light-theme", "dark-theme");
-
-  if (theme === "light") {
-    document.body.classList.add("light-theme");
-  } else {
-    document.body.classList.add("dark-theme");
-  }
-
-  localStorage.setItem("theme", theme);
 }
 
 function pctChange(base, latest) {
@@ -365,6 +426,10 @@ function varianceSample(arr) {
   if (nums.length < 2) return 0;
   const mean = avg(nums);
   return nums.reduce((acc, v) => acc + (v - mean) * (v - mean), 0) / (nums.length - 1);
+}
+
+function sampleStd(arr) {
+  return Math.sqrt(Math.max(varianceSample(arr), 0));
 }
 
 function annualizedVolPct(returns) {
@@ -398,65 +463,114 @@ function normalizeBreakdown(raw) {
   };
 
   const total = data.market + data.drawdown + data.vol + data.liq;
-  let out = {
+  const out = {
     market: Math.round((data.market / total) * 100),
     drawdown: Math.round((data.drawdown / total) * 100),
     vol: Math.round((data.vol / total) * 100),
     liq: Math.round((data.liq / total) * 100)
   };
 
-  let diff = 100 - (out.market + out.drawdown + out.vol + out.liq);
-  if (diff !== 0) {
+  const sum = out.market + out.drawdown + out.vol + out.liq;
+  if (sum !== 100) {
     const keys = Object.keys(out).sort((a, b) => out[b] - out[a]);
-    out[keys[0]] += diff;
+    out[keys[0]] += (100 - sum);
   }
-
   return out;
 }
 
-function computeConfidenceFromHistory(len, metrics) {
-  let conf = 66;
-
-  if (len >= 20) conf += 4;
-  if (len >= 60) conf += 4;
-  if (len >= 120) conf += 4;
-
-  if ((metrics?.vol20 || 0) <= 35) conf += 3;
-  if ((metrics?.vol20 || 0) >= 55) conf -= 3;
-  if (Math.abs(metrics?.mdd6m || 0) >= 25) conf -= 2;
-  if (Math.abs(metrics?.volChgPct || 0) <= 20) conf += 2;
-
-  return Math.round(clamp(conf, 60, 92));
+function ensureUnique(arr) {
+  return [...new Set(arr)];
 }
 
-function buildDriversFromMetrics(metrics, level, lang) {
-  const vol20 = Number(metrics?.vol20 || 0);
-  const vol60 = Number(metrics?.vol60 || 0);
-  const mdd6m = Number(metrics?.mdd6m || 0);
-  const beta = Number(metrics?.beta || 1);
-  const negDays20 = Number(metrics?.negDays20 || 0);
-  const volChgPct = Number(metrics?.volChgPct || 0);
-  const momentum20 = Number(metrics?.momentum20 || 0);
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
 
-  if (lang === "zh") {
-    return [
-      `近20日年化波动率约 ${Math.round(vol20)}%，${vol20 > vol60 ? "短期波动高于中期" : "短期波动低于或接近中期"}。`,
-      `近6个月最大回撤约 ${mdd6m.toFixed(1)}%，${Math.abs(mdd6m) > 25 ? "回撤压力较高" : Math.abs(mdd6m) > 12 ? "回撤压力中等" : "回撤压力较低"}。`,
-      `最近20个交易日中有 ${negDays20} 天为负收益，${negDays20 > 11 ? "短期情绪偏弱" : negDays20 > 8 ? "短期信号较混合" : "短期表现较稳"}。`,
-      `Beta 约为 ${beta.toFixed(2)}，${beta > 1.4 ? "对大盘更敏感" : beta > 1.0 ? "对大盘敏感度中等" : "对大盘敏感度较低"}。`,
-      `近10日成交量较前10日${volChgPct >= 0 ? "增加" : "减少"} ${Math.abs(volChgPct).toFixed(0)}%，${Math.abs(volChgPct) > 25 ? "流动性变化较明显" : "流动性相对平稳"}。`,
-      `近20日价格动量为 ${fmtSignedPct(momentum20, 1)}，${level === "HIGH" ? "风险信号偏高" : level === "MEDIUM" ? "风险信号中性" : "风险信号偏低"}。`
-    ];
+function fmtDateShort(iso) {
+  if (!iso) return "";
+  return String(iso).slice(0, 10);
+}
+
+function fmt7d(n) {
+  return `${n >= 0 ? "+" : ""}${n}`;
+}
+
+function fmtSignedPct(n, digits = 1) {
+  const v = Number(n) || 0;
+  return `${v >= 0 ? "+" : ""}${v.toFixed(digits)}%`;
+}
+
+function safeText(v, fallback = "-") {
+  if (v === null || v === undefined || v === "") return fallback;
+  return String(v);
+}
+
+function levelToBadgeClass(level) {
+  if (level === "HIGH") return "high";
+  if (level === "MEDIUM") return "medium";
+  return "low";
+}
+
+function levelToText(level) {
+  return level === "HIGH"
+    ? t("level_high")
+    : level === "MEDIUM"
+    ? t("level_medium")
+    : t("level_low");
+}
+
+function deriveLevelFromScore(score) {
+  return score >= 70 ? "HIGH" : score >= 40 ? "MEDIUM" : "LOW";
+}
+
+function setNumColor(el, n) {
+  if (!el) return;
+  el.classList.remove("pos", "neg", "neu");
+  if (n > 0) el.classList.add("pos");
+  else if (n < 0) el.classList.add("neg");
+  else el.classList.add("neu");
+}
+
+function applyTheme(theme) {
+  document.body.classList.remove("light-theme", "dark-theme");
+  document.body.classList.add(theme === "light" ? "light-theme" : "dark-theme");
+  localStorage.setItem("theme", theme);
+}
+
+function getCompareXLabels(range) {
+  if (currentLang === "zh") {
+    if (range === "1M") return { start: "1个月前", mid: "中间", end: "现在" };
+    if (range === "3M") return { start: "3个月前", mid: "中间", end: "现在" };
+    if (range === "6M") return { start: "6个月前", mid: "中间", end: "现在" };
+    if (range === "1Y") return { start: "1年前", mid: "中间", end: "现在" };
+    if (range === "3Y") return { start: "3年前", mid: "中间", end: "现在" };
+    return { start: "开始", mid: "中间", end: "结束" };
   }
 
-  return [
-    `20D annualized volatility is about ${Math.round(vol20)}%, ${vol20 > vol60 ? "higher than 60D" : "below or close to 60D"}.`,
-    `6M max drawdown is about ${mdd6m.toFixed(1)}%, ${Math.abs(mdd6m) > 25 ? "showing elevated drawdown pressure" : Math.abs(mdd6m) > 12 ? "showing moderate drawdown pressure" : "showing limited drawdown pressure"}.`,
-    `There were ${negDays20} negative-return days in the last 20 sessions, ${negDays20 > 11 ? "suggesting weaker short-term sentiment" : negDays20 > 8 ? "showing mixed short-term signals" : "showing steadier short-term behavior"}.`,
-    `Beta is around ${beta.toFixed(2)}, ${beta > 1.4 ? "indicating higher market sensitivity" : beta > 1.0 ? "indicating moderate market sensitivity" : "indicating lower market sensitivity"}.`,
-    `Volume ${volChgPct >= 0 ? "increased" : "decreased"} by ${Math.abs(volChgPct).toFixed(0)}% versus the prior 10 sessions, ${Math.abs(volChgPct) > 25 ? "so liquidity conditions changed clearly" : "so liquidity remains relatively stable"}.`,
-    `20D price momentum is ${fmtSignedPct(momentum20, 1)}, ${level === "HIGH" ? "which supports a higher risk reading" : level === "MEDIUM" ? "which keeps the signal mixed" : "which supports a lower risk reading"}.`
+  if (range === "1M") return { start: "1M Ago", mid: "Middle", end: "Now" };
+  if (range === "3M") return { start: "3M Ago", mid: "Middle", end: "Now" };
+  if (range === "6M") return { start: "6M Ago", mid: "Middle", end: "Now" };
+  if (range === "1Y") return { start: "1Y Ago", mid: "Middle", end: "Now" };
+  if (range === "3Y") return { start: "3Y Ago", mid: "Middle", end: "Now" };
+  return { start: "Start", mid: "Middle", end: "End" };
+}
+
+function buildCompareSeries(stock) {
+  const base = Number(stock.score) || 0;
+  const d7 = Number(stock.d7) || 0;
+  const series = [
+    Math.max(0, base - 8),
+    Math.max(0, base - 5),
+    Math.max(0, base - 2),
+    Math.max(0, Math.min(100, base + Math.round(d7 / 2))),
+    Math.max(0, Math.min(100, base))
   ];
+  return series.map(v => Math.max(0, Math.min(100, v)));
 }
 
 function buildDefaultMetricsFromSeed(score, d7) {
@@ -464,19 +578,12 @@ function buildDefaultMetricsFromSeed(score, d7) {
   const d = Number(d7) || 0;
 
   const vol20 = clamp(18 + s * 0.45, 16, 68);
-  const vol60 = clamp(vol20 - 6 + (d < 0 ? 2 : -1), 14, 64);
+  const vol60 = clamp(vol20 - 4 + (d < 0 ? 1.5 : -0.5), 14, 64);
   const mdd6m = -clamp(5 + s * 0.27, 5, 35);
   const beta = clamp(0.72 + s / 62, 0.70, 2.10);
   const volChgPct = clamp(d * 2.2, -60, 60);
   const negDays20 = clamp(Math.round(6 + s / 8), 4, 15);
   const momentum20 = clamp(d * 1.8, -25, 25);
-
-  const raw = {
-    market: clamp(beta * 22, 8, 90),
-    drawdown: clamp(Math.abs(mdd6m) * 2.2, 8, 90),
-    vol: clamp(vol20 * 1.5, 8, 90),
-    liq: clamp(Math.abs(volChgPct) * 0.9 + 10, 8, 60)
-  };
 
   return {
     vol20: Number(vol20.toFixed(1)),
@@ -486,22 +593,19 @@ function buildDefaultMetricsFromSeed(score, d7) {
     volChgPct: Number(volChgPct.toFixed(1)),
     negDays20,
     momentum20: Number(momentum20.toFixed(1)),
-    eventRisk: Math.round(clamp(30 + s * 0.45, 20, 90)),
-    breakdown: normalizeBreakdown(raw),
-    hasVolume: false
+    breakdown: normalizeBreakdown({
+      market: beta * 22,
+      drawdown: Math.abs(mdd6m) * 2.2,
+      vol: vol20 * 1.45,
+      liq: Math.abs(volChgPct) * 0.9 + 8
+    })
   };
 }
 
 function buildDynamicAnalyticsFromHistory(series, fallbackD7 = 0) {
   const points = Array.isArray(series) ? series : [];
-
-  const closes = points
-    .map(p => Number(p.close))
-    .filter(v => Number.isFinite(v));
-
-  const volumes = points
-    .map(p => Number(p.volume ?? p.v))
-    .filter(v => Number.isFinite(v));
+  const closes = points.map(p => Number(p.close)).filter(v => Number.isFinite(v));
+  const volumes = points.map(p => Number(p.volume ?? p.v)).filter(v => Number.isFinite(v));
 
   const returns = [];
   for (let i = 1; i < closes.length; i++) {
@@ -514,9 +618,9 @@ function buildDynamicAnalyticsFromHistory(series, fallbackD7 = 0) {
 
   const ret20 = returns.slice(-20);
   const ret60 = returns.slice(-60);
+
   const vol20 = annualizedVolPct(ret20);
   const vol60 = annualizedVolPct(ret60);
-
   const mdd6m = calcMaxDrawdownPct(closes.slice(-126));
   const negDays20 = ret20.filter(r => r < 0).length;
 
@@ -524,26 +628,16 @@ function buildDynamicAnalyticsFromHistory(series, fallbackD7 = 0) {
     ? pctChange(closes[closes.length - 21], closes[closes.length - 1])
     : Number(fallbackD7) || 0;
 
-  let hasVolume = false;
   let volChgPct = clamp((Number(fallbackD7) || 0) * 2, -60, 60);
-
   if (volumes.length >= 20) {
     const prev10 = avg(volumes.slice(-20, -10));
     const last10 = avg(volumes.slice(-10));
     if (Number.isFinite(prev10) && Number.isFinite(last10) && prev10 !== 0) {
       volChgPct = pctChange(prev10, last10);
-      hasVolume = true;
     }
   }
 
   const beta = clamp(0.65 + (vol60 / 35), 0.65, 2.20);
-
-  const marketRaw = clamp(((beta - 0.65) / 1.55) * 100 + (momentum20 < 0 ? Math.min(18, Math.abs(momentum20) * 0.8) : 0), 6, 100);
-  const drawdownRaw = clamp((Math.abs(mdd6m) / 30) * 100, 6, 100);
-  const volRaw = clamp((((vol20 * 0.6) + (vol60 * 0.4)) / 50) * 100, 6, 100);
-  const liqRaw = hasVolume
-    ? clamp((Math.abs(volChgPct) / 100) * 100, 6, 65)
-    : clamp((Math.abs(volChgPct) / 80) * 100, 6, 45);
 
   return {
     vol20: Number(vol20.toFixed(1)),
@@ -553,142 +647,730 @@ function buildDynamicAnalyticsFromHistory(series, fallbackD7 = 0) {
     volChgPct: Number(volChgPct.toFixed(1)),
     negDays20,
     momentum20: Number(momentum20.toFixed(1)),
-    eventRisk: Math.round(clamp((negDays20 / 20) * 100 + (momentum20 < 0 ? Math.min(20, Math.abs(momentum20)) : 0), 10, 90)),
     breakdown: normalizeBreakdown({
-      market: marketRaw,
-      drawdown: drawdownRaw,
-      vol: volRaw,
-      liq: liqRaw
-    }),
-    hasVolume
+      market: (((beta - 0.65) / 1.55) * 100) + (momentum20 < 0 ? Math.min(16, Math.abs(momentum20) * 0.8) : 0),
+      drawdown: (Math.abs(mdd6m) / 30) * 100,
+      vol: (((vol20 * 0.6) + (vol60 * 0.4)) / 50) * 100,
+      liq: (Math.abs(volChgPct) / 100) * 60 + 6
+    })
   };
 }
 
-function updateTextCandidates(candidates, value) {
-  for (const key of candidates) {
-    const byId = document.getElementById(key);
-    if (byId) {
-      byId.textContent = value;
-      return true;
-    }
-
-    const byDataBind = document.querySelector(`[data-bind="${key}"]`);
-    if (byDataBind) {
-      byDataBind.textContent = value;
-      return true;
-    }
-  }
-  return false;
+function computeConfidenceFromHistory(len, metrics) {
+  let conf = 66;
+  if (len >= 20) conf += 4;
+  if (len >= 60) conf += 4;
+  if (len >= 120) conf += 4;
+  if ((metrics?.vol20 || 0) <= 35) conf += 3;
+  if ((metrics?.vol20 || 0) >= 55) conf -= 3;
+  if (Math.abs(metrics?.mdd6m || 0) >= 25) conf -= 2;
+  return Math.round(clamp(conf, 60, 92));
 }
 
-function renderDriversPanel(pred) {
-  const drivers = Array.isArray(pred?.drivers) ? pred.drivers : [];
+function buildDriversFromMetrics(metrics, level) {
+  const vol20 = Number(metrics?.vol20 || 0);
+  const vol60 = Number(metrics?.vol60 || 0);
+  const mdd6m = Number(metrics?.mdd6m || 0);
+  const beta = Number(metrics?.beta || 1);
+  const negDays20 = Number(metrics?.negDays20 || 0);
+  const volChgPct = Number(metrics?.volChgPct || 0);
+  const momentum20 = Number(metrics?.momentum20 || 0);
 
-  // Existing fixed slots
-  ["d1", "d2", "d3", "d4", "d5", "d6"].forEach((id, idx) => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = drivers[idx] || "";
-  });
-
-  // Optional dynamic container
-  const wrap = document.getElementById("s2DriversList") || document.getElementById("driversList");
-  if (wrap) {
-    wrap.innerHTML = drivers.map((txt, idx) => `
-      <div class="driver-item" id="auto-driver-${idx + 1}">
-        ${escapeHtml(txt)}
-      </div>
-    `).join("");
+  if (currentLang === "zh") {
+    return [
+      `近20日年化波动率约 ${Math.round(vol20)}%，${vol20 > vol60 ? "短期波动高于中期。" : "短期波动低于或接近中期。"}`,
+      `近6个月最大回撤约 ${mdd6m.toFixed(1)}%，${Math.abs(mdd6m) > 25 ? "回撤压力较高。" : Math.abs(mdd6m) > 12 ? "回撤压力中等。" : "回撤压力较低。"}`,
+      `最近20个交易日中有 ${negDays20} 天为负收益，${negDays20 > 11 ? "短期情绪偏弱。" : negDays20 > 8 ? "短期信号较混合。" : "短期表现较稳。"}`,
+      `Beta 约为 ${beta.toFixed(2)}，${beta > 1.4 ? "对大盘更敏感。" : beta > 1.0 ? "对大盘敏感度中等。" : "对大盘敏感度较低。"}`,
+      `近10日成交量较前10日${volChgPct >= 0 ? "增加" : "减少"} ${Math.abs(volChgPct).toFixed(0)}%，${Math.abs(volChgPct) > 25 ? "流动性变化较明显。" : "流动性相对平稳。"}`,
+      `近20日价格动量为 ${fmtSignedPct(momentum20, 1)}，${level === "HIGH" ? "风险信号偏高。" : level === "MEDIUM" ? "风险信号中性。" : "风险信号偏低。"}`
+    ];
   }
+
+  return [
+    `20D annualized volatility is about ${Math.round(vol20)}%, ${vol20 > vol60 ? "higher than 60D." : "below or close to 60D."}`,
+    `6M max drawdown is about ${mdd6m.toFixed(1)}%, ${Math.abs(mdd6m) > 25 ? "showing elevated drawdown pressure." : Math.abs(mdd6m) > 12 ? "showing moderate drawdown pressure." : "showing limited drawdown pressure."}`,
+    `There were ${negDays20} negative-return days in the last 20 sessions, ${negDays20 > 11 ? "suggesting weaker short-term sentiment." : negDays20 > 8 ? "showing mixed short-term signals." : "showing steadier short-term behavior."}`,
+    `Beta is around ${beta.toFixed(2)}, ${beta > 1.4 ? "indicating higher market sensitivity." : beta > 1.0 ? "indicating moderate market sensitivity." : "indicating lower market sensitivity."}`,
+    `Volume ${volChgPct >= 0 ? "increased" : "decreased"} by ${Math.abs(volChgPct).toFixed(0)}% versus the prior 10 sessions, ${Math.abs(volChgPct) > 25 ? "so liquidity changed clearly." : "so liquidity stayed relatively stable."}`,
+    `20D price momentum is ${fmtSignedPct(momentum20, 1)}, ${level === "HIGH" ? "supporting a higher risk reading." : level === "MEDIUM" ? "keeping the signal mixed." : "supporting a lower risk reading."}`
+  ];
 }
 
-function renderBreakdownAndMetrics(pred) {
-  const bd = pred?.metrics?.breakdown || pred?.breakdown || { market: 35, drawdown: 30, vol: 25, liq: 10 };
-  const m = pred?.metrics || {};
+function buildActionAdvice(pred) {
+  const vol20 = Number(pred?.metrics?.vol20 || 0);
+  const mdd6m = Number(pred?.metrics?.mdd6m || 0);
+  const momentum20 = Number(pred?.metrics?.momentum20 || 0);
+  const volChg = Number(pred?.metrics?.volChgPct || 0);
 
-  const marketTxt = `${Math.round(bd.market)}%`;
-  const drawdownTxt = `${Math.round(bd.drawdown)}%`;
-  const volTxt = `${Math.round(bd.vol)}%`;
-  const liqTxt = `${Math.round(bd.liq)}%`;
+  if (currentLang === "zh") {
+    if (pred.level === "HIGH") {
+      if (momentum20 < 0) {
+        return "建议谨慎观望，短期不宜追高；优先关注波动和回撤是否收敛。";
+      }
+      return "风险较高，建议控制仓位，并观察成交量与回撤是否继续扩大。";
+    }
 
-  const vol20Txt = `${Math.round(Number(m.vol20 || 0))}%`;
-  const vol60Txt = `${Math.round(Number(m.vol60 || 0))}%`;
-  const mddTxt = `${Number(m.mdd6m || 0).toFixed(1)}%`;
-  const betaTxt = Number(m.beta || 0).toFixed(2);
-  const volChgTxt = `${Number(m.volChgPct || 0) >= 0 ? "↑" : "↓"} ${Math.abs(Number(m.volChgPct || 0)).toFixed(0)}%`;
+    if (pred.level === "MEDIUM") {
+      if (vol20 > 45 || Math.abs(mdd6m) > 18) {
+        return "建议继续观察，重点留意回撤是否扩大，以及短期波动是否继续上升。";
+      }
+      return "风险中等，可结合趋势和基本面再判断，不建议仅凭单一信号操作。";
+    }
 
-  updateTextCandidates(["bdMarketVal", "bdMarketValue", "breakdownMarket", "marketRiskValue"], marketTxt);
-  updateTextCandidates(["bdDrawdownVal", "bdDrawdownValue", "breakdownDrawdown", "drawdownRiskValue"], drawdownTxt);
-  updateTextCandidates(["bdVolVal", "bdVolValue", "breakdownVol", "volRiskValue"], volTxt);
-  updateTextCandidates(["bdLiqVal", "bdLiqValue", "breakdownLiquidity", "liqRiskValue"], liqTxt);
+    if (momentum20 >= 0 && volChg >= 0) {
+      return "整体风险偏低，走势相对稳定，可继续跟踪量能与趋势确认。";
+    }
 
-  updateTextCandidates(["metricVol20Val", "metric20Vol", "vol20Value"], vol20Txt);
-  updateTextCandidates(["metricVol60Val", "metric60Vol", "vol60Value"], vol60Txt);
-  updateTextCandidates(["metricMdd6mVal", "metricMddVal", "mdd6mValue"], mddTxt);
-  updateTextCandidates(["metricBetaVal", "metricBeta", "betaValue"], betaTxt);
-  updateTextCandidates(["metricVolChgVal", "metricVolumeChange", "volChgValue"], volChgTxt);
+    if (momentum20 < 0) {
+      return "整体风险偏低，但近期动量转弱，建议轻仓观察并留意支撑位。";
+    }
 
-  const breakdownWrap = document.getElementById("s2BreakdownList") || document.getElementById("breakdownList");
-  if (breakdownWrap) {
-    breakdownWrap.innerHTML = `
-      <div class="kv-row"><span>${I18N[currentLang].bd_market}</span><span>${marketTxt}</span></div>
-      <div class="kv-row"><span>${I18N[currentLang].bd_drawdown}</span><span>${drawdownTxt}</span></div>
-      <div class="kv-row"><span>${I18N[currentLang].bd_vol}</span><span>${volTxt}</span></div>
-      <div class="kv-row"><span>${I18N[currentLang].bd_liq}</span><span>${liqTxt}</span></div>
-    `;
+    return "整体风险偏低，可继续观察价格与成交量是否维持稳定。";
   }
 
-  const metricsWrap = document.getElementById("s2MetricsList") || document.getElementById("metricsList");
-  if (metricsWrap) {
-    metricsWrap.innerHTML = `
-      <div class="kv-row"><span>20D vol</span><span>${vol20Txt}</span></div>
-      <div class="kv-row"><span>60D vol</span><span>${vol60Txt}</span></div>
-      <div class="kv-row"><span>6M MDD</span><span>${mddTxt}</span></div>
-      <div class="kv-row"><span>Beta</span><span>${betaTxt}</span></div>
-      <div class="kv-row"><span>${I18N[currentLang].metric_volchg}</span><span>${volChgTxt}</span></div>
-    `;
+  if (pred.level === "HIGH") {
+    if (momentum20 < 0) {
+      return "Stay cautious and avoid chasing in the short term; watch whether volatility and drawdown start to ease.";
+    }
+    return "Risk is elevated, so position control is recommended while watching volume and drawdown closely.";
   }
 
-  const rulesWrap = document.getElementById("s2RulesList") || document.getElementById("rulesList");
-  if (rulesWrap) {
-    rulesWrap.innerHTML = `
-      <li><b>${I18N[currentLang].rule_high}:</b> ${currentLang === "zh" ? "未来30天回撤 > 12%" : "forward 30D drawdown > 12%"}</li>
-      <li><b>${I18N[currentLang].rule_medium}:</b> ${currentLang === "zh" ? "6% - 12%" : "6% - 12%"}</li>
-      <li><b>${I18N[currentLang].rule_low}:</b> ${currentLang === "zh" ? "< 6%" : "< 6%"}</li>
-    `;
+  if (pred.level === "MEDIUM") {
+    if (vol20 > 45 || Math.abs(mdd6m) > 18) {
+      return "Keep monitoring the stock and focus on whether drawdown widens and short-term volatility keeps rising.";
+    }
+    return "Risk is moderate, so combine this signal with trend and fundamentals before making a decision.";
   }
+
+  if (momentum20 >= 0 && volChg >= 0) {
+    return "Overall risk is lower and the trend looks steadier; keep tracking volume and trend confirmation.";
+  }
+
+  if (momentum20 < 0) {
+    return "Overall risk is lower, but momentum has weakened recently, so a light and watchful approach is better.";
+  }
+
+  return "Overall risk is lower; keep watching whether price and volume remain stable.";
 }
 
 function buildSummaryText(pred) {
+  const advice = buildActionAdvice(pred);
   const vol20 = Number(pred?.metrics?.vol20 || 0);
   const mdd6m = Number(pred?.metrics?.mdd6m || 0);
 
   if (currentLang === "zh") {
-    if (pred.level === "HIGH") {
-      return `短期风险较高（20日波动约 ${Math.round(vol20)}%，6个月回撤约 ${mdd6m.toFixed(1)}%）。`;
-    }
-    if (pred.level === "MEDIUM") {
-      return `短期风险中等（波动与回撤信号较混合，20日波动约 ${Math.round(vol20)}%）。`;
-    }
-    return `短期风险较低（近阶段相对稳定，20日波动约 ${Math.round(vol20)}%，回撤约 ${mdd6m.toFixed(1)}%）。`;
+    const base = pred.level === "HIGH"
+      ? `短期风险较高（20日波动约 ${Math.round(vol20)}%，6个月回撤约 ${mdd6m.toFixed(1)}%）。`
+      : pred.level === "MEDIUM"
+      ? `短期风险中等（波动与回撤信号较混合，20日波动约 ${Math.round(vol20)}%）。`
+      : `短期风险较低（近阶段相对稳定，20日波动约 ${Math.round(vol20)}%，回撤约 ${mdd6m.toFixed(1)}%）。`;
+
+    return `${base}${advice}`;
   }
 
-  if (pred.level === "HIGH") {
-    return `Higher short-term risk (20D vol about ${Math.round(vol20)}%, 6M drawdown about ${mdd6m.toFixed(1)}%).`;
-  }
-  if (pred.level === "MEDIUM") {
-    return `Moderate short-term risk with mixed volatility and drawdown signals (20D vol about ${Math.round(vol20)}%).`;
-  }
-  return `Lower short-term risk with relatively steadier recent behavior (20D vol about ${Math.round(vol20)}%, drawdown about ${mdd6m.toFixed(1)}%).`;
+  const base = pred.level === "HIGH"
+    ? `Higher short-term risk (20D vol about ${Math.round(vol20)}%, 6M drawdown about ${mdd6m.toFixed(1)}%).`
+    : pred.level === "MEDIUM"
+    ? `Moderate short-term risk with mixed volatility and drawdown signals (20D vol about ${Math.round(vol20)}%).`
+    : `Lower short-term risk with relatively steadier recent behavior (20D vol about ${Math.round(vol20)}%, drawdown about ${mdd6m.toFixed(1)}%).`;
+
+  return `${base} ${advice}`;
 }
 
-// ----- Data fetch -----
+
+
+function forecastConfidenceLabel(conf) {
+  if (conf === "High") return t("fc_conf_high");
+  if (conf === "Medium") return t("fc_conf_medium");
+  if (conf === "Low") return t("fc_conf_low");
+  return safeText(conf);
+}
+
+function forecastConfidenceBadgeClass(conf) {
+  if (conf === "High") return "high";
+  if (conf === "Medium") return "medium";
+  return "low";
+}
+
+function forecastSummaryEntries(summary = {}) {
+  return [
+    [t("fc_summary_start"), safeText(summary.startPrice)],
+    [t("fc_summary_end"), safeText(summary.endPrice)],
+    [t("fc_summary_avg"), safeText(summary.averagePrice)],
+    [t("fc_summary_high"), safeText(summary.highestPrice)],
+    [t("fc_summary_low"), safeText(summary.lowestPrice)],
+    [t("fc_summary_change"), `${Number(summary.priceChangePct || 0) >= 0 ? "+" : ""}${safeText(summary.priceChangePct)}%`],
+    [t("fc_summary_days"), safeText(summary.totalDataDays)],
+  ];
+}
+
+function hashTickerSeed(input) {
+  const s = String(input || "DEMO");
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+function seededRandom(seed) {
+  let t = seed >>> 0;
+  return () => {
+    t += 0x6D2B79F5;
+    let r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function offlinePointCount(range) {
+  return getRangeConfig(range).points;
+}
+
+function getTickerArchetype(profile) {
+  const base = tickerBaseName(profile.clean);
+  const preset = {
+    AAPL: "steady-down",
+    MSFT: "steady-up",
+    NVDA: "strong-up",
+    TSLA: "volatile-swing",
+    AMZN: "rebound",
+    META: "range-bound",
+    GOOGL: "soft-down",
+    "300750": "rebound",
+    "600519": "range-bound",
+    "002594": "strong-up",
+    BABA: "soft-down",
+    JPM: "steady-up",
+    AMD: "volatile-swing"
+  };
+  return preset[base] || ["strong-up", "steady-up", "steady-down", "volatile-swing", "rebound", "range-bound", "soft-down"][profile.seed % 7];
+}
+
+function getTickerPatternConfig(profile) {
+  const base = tickerBaseName(profile.clean);
+  const presets = {
+    AAPL: { driftBias: -0.0015, waveBoost: 0.95, shockBoost: 0.75, livePulse: 0.0018 },
+    TSLA: { driftBias: 0.0006, waveBoost: 1.65, shockBoost: 1.9, livePulse: 0.0048 },
+    NVDA: { driftBias: 0.0038, waveBoost: 1.25, shockBoost: 1.1, livePulse: 0.0032 },
+    MSFT: { driftBias: 0.0018, waveBoost: 0.85, shockBoost: 0.65, livePulse: 0.0015 },
+    AMZN: { driftBias: 0.0007, waveBoost: 1.15, shockBoost: 1.0, livePulse: 0.0022 },
+    META: { driftBias: 0.0002, waveBoost: 1.05, shockBoost: 0.85, livePulse: 0.0020 },
+    GOOGL: { driftBias: -0.0008, waveBoost: 0.9, shockBoost: 0.7, livePulse: 0.0017 },
+    "300750": { driftBias: 0.0020, waveBoost: 1.35, shockBoost: 1.35, livePulse: 0.0030 },
+    "600519": { driftBias: 0.0004, waveBoost: 0.75, shockBoost: 0.55, livePulse: 0.0012 },
+    "002594": { driftBias: 0.0027, waveBoost: 1.2, shockBoost: 1.05, livePulse: 0.0028 }
+  };
+  return presets[base] || {
+    driftBias: (((profile.seed >> 11) % 11) - 5) / 3000,
+    waveBoost: 0.8 + ((profile.seed >> 15) % 9) / 10,
+    shockBoost: 0.7 + ((profile.seed >> 19) % 8) / 10,
+    livePulse: 0.0015 + ((profile.seed >> 23) % 10) / 5000
+  };
+}
+
+function generateOfflineHistory(ticker, range) {
+  const profile = getTickerProfile(ticker);
+  const cfg = getRangeConfig(range);
+  const pattern = getTickerPatternConfig(profile);
+  const rand = seededRandom(hashTickerSeed(`${profile.clean}:${range}:history:v4`));
+  const shockMap = buildShockMap(cfg.points, profile.seed ^ hashTickerSeed(`${range}:detail`), cfg.shockScale * pattern.shockBoost);
+  const end = new Date();
+  const series = [];
+  const archetype = getTickerArchetype(profile);
+
+  let price = profile.basePrice * (1 + (((profile.seed >> 20) % 9) - 4) / 100);
+
+  const trendByType = {
+    "strong-up": 0.0058,
+    "steady-up": 0.0036,
+    "steady-down": -0.0036,
+    "soft-down": -0.0021,
+    "rebound": 0.0007,
+    "range-bound": 0.0001,
+    "volatile-swing": 0.0003,
+  };
+  const waveByType = {
+    "strong-up": 0.010,
+    "steady-up": 0.008,
+    "steady-down": 0.008,
+    "soft-down": 0.007,
+    "rebound": 0.011,
+    "range-bound": 0.012,
+    "volatile-swing": 0.018,
+  };
+
+  for (let i = 0; i < cfg.points; i++) {
+    const progress = i / Math.max(1, cfg.points - 1);
+    let regimeTrend = trendByType[archetype] * cfg.trendScale + pattern.driftBias;
+
+    if (archetype === "rebound") {
+      regimeTrend = (progress < 0.42 ? -0.0048 : 0.0066) * cfg.trendScale + pattern.driftBias;
+    } else if (archetype === "range-bound") {
+      regimeTrend = Math.sin(progress * Math.PI * 2.4 + profile.curvePhase) * 0.0010 + pattern.driftBias * 0.3;
+    } else if (archetype === "volatile-swing") {
+      regimeTrend = Math.sin(progress * Math.PI * 3.6 + profile.curvePhase) * 0.0033 + pattern.driftBias * 0.5;
+    }
+
+    const waveAmp = waveByType[archetype] * pattern.waveBoost * (0.72 + cfg.noiseScale * 0.34);
+    const cycleA = Math.sin(progress * Math.PI * (1.4 + ((profile.seed >> 6) % 4)) + profile.curvePhase) * waveAmp;
+    const cycleB = Math.cos(progress * Math.PI * (2.6 + ((profile.seed >> 9) % 5)) + profile.curvePhase * 0.72) * (waveAmp * 0.48);
+    const cycleC = Math.sin(progress * Math.PI * (4.1 + ((profile.seed >> 12) % 4)) + profile.curvePhase * 1.12) * (waveAmp * 0.22);
+    const noise = (rand() - 0.5) * profile.volTilt * cfg.noiseScale * (archetype === "volatile-swing" ? 1.8 : 1.05);
+    const shock = shockMap.get(i) || 0;
+    const stepReturn = regimeTrend + cycleA + cycleB + cycleC + shock + noise;
+    price = Math.max(2, price * (1 + stepReturn));
+
+    const d = new Date(end);
+    d.setDate(end.getDate() - ((cfg.points - 1 - i) * cfg.dayStep));
+
+    const volumeBase = 680000 + ((profile.seed % 15) * 88000);
+    const volume = Math.round(volumeBase * (0.78 + rand() * 0.46 + Math.abs(stepReturn) * 3.6));
+
+    series.push({
+      t: d.toISOString(),
+      close: Number(price.toFixed(2)),
+      volume,
+    });
+  }
+
+  const liveBucket = Math.floor(Date.now() / 8000);
+  const livePulse = Math.sin(liveBucket * 0.9 + (profile.seed % 17)) * pattern.livePulse;
+  for (let i = Math.max(0, series.length - 4); i < series.length; i++) {
+    const weight = (i - (series.length - 4) + 1) / 4;
+    const nextClose = Math.max(2, Number(series[i].close) * (1 + livePulse * weight));
+    series[i].close = Number(nextClose.toFixed(2));
+  }
+
+  return {
+    ticker: profile.clean,
+    provider: 'offline-demo',
+    range,
+    points: series.length,
+    series,
+    ts: new Date().toISOString(),
+    offline: true,
+  };
+}
+
+function buildHistorySummary(series) {
+  const points = Array.isArray(series) ? series : [];
+  const closes = points.map((p) => Number(p.close)).filter((v) => Number.isFinite(v));
+  if (!closes.length) {
+    return {
+      startPrice: '-',
+      endPrice: '-',
+      averagePrice: '-',
+      highestPrice: '-',
+      lowestPrice: '-',
+      priceChangePct: 0,
+      totalDataDays: 0,
+    };
+  }
+
+  return {
+    startPrice: Number(closes[0].toFixed(2)),
+    endPrice: Number(closes[closes.length - 1].toFixed(2)),
+    averagePrice: Number(avg(closes).toFixed(2)),
+    highestPrice: Number(Math.max(...closes).toFixed(2)),
+    lowestPrice: Number(Math.min(...closes).toFixed(2)),
+    priceChangePct: Number(pctChange(closes[0], closes[closes.length - 1]).toFixed(2)),
+    totalDataDays: closes.length,
+  };
+}
+
+function shortForecastFactors(metrics = {}, projectedChangePct = 0, days = 7, lang = currentLang) {
+  const momentum20 = Number(metrics.momentum20 || 0);
+  const vol20 = Number(metrics.vol20 || 0);
+  const mdd6m = Number(metrics.mdd6m || 0);
+  const volChgPct = Number(metrics.volChgPct || 0);
+
+  if (lang === "zh") {
+    return [
+      momentum20 >= 0 ? "近期动量偏强" : "近期动量偏弱",
+      vol20 > 45 ? "短期波动偏高" : "短期波动可控",
+      Math.abs(mdd6m) > 18 ? "回撤压力仍较明显" : "回撤压力较有限",
+      volChgPct >= 0 ? "流动性活跃度在改善" : "流动性活跃度偏弱",
+      `${days}天预期变动：${projectedChangePct >= 0 ? "+" : ""}${projectedChangePct.toFixed(2)}%`,
+    ];
+  }
+
+  return [
+    momentum20 >= 0 ? "Positive recent momentum" : "Weak recent momentum",
+    vol20 > 45 ? "Higher short-term volatility" : "Contained short-term volatility",
+    Math.abs(mdd6m) > 18 ? "Drawdown pressure remains visible" : "Drawdown pressure is limited",
+    volChgPct >= 0 ? "Liquidity activity is improving" : "Liquidity activity is softer",
+    `${days}D projected move: ${projectedChangePct >= 0 ? "+" : ""}${projectedChangePct.toFixed(2)}%`,
+  ];
+}
+
+function localizedForecastDirection(direction) {
+  if (currentLang === "zh") {
+    if (direction === "Bullish") return "看涨";
+    if (direction === "Bearish") return "看跌";
+    return "震荡";
+  }
+  return direction || "Sideways";
+}
+
+function localizedForecastMethod(method) {
+  if (currentLang === "zh") {
+    if (String(method || "").toLowerCase().includes("rule-based browser forecast")) return "基于规则的浏览器预测";
+    if (String(method || "").toLowerCase().includes("browser forecast")) return "浏览器预测";
+  }
+  return safeText(method, "-");
+}
+
+function localizedForecastSource(result = {}) {
+  const label = result.source || result.method || "-";
+  if (currentLang === "zh") {
+    if (String(label).toLowerCase().includes("integrated browser forecast")) return "浏览器整合预测";
+    if (String(label).toLowerCase().includes("rule-based browser forecast")) return "基于规则的浏览器预测";
+  }
+  return label;
+}
+
+function localizedForecastAnalysis(result = {}) {
+  const days = Number(result.forecastDays || 0);
+  const projectedChangePct = Number(result.projectedChangePct || 0);
+  const vol20 = Number(result.metrics?.vol20 || 0);
+
+  if (currentLang === "zh") {
+    return `使用 ${days} 天预测期，模型预计相对最新收盘价${projectedChangePct >= 0 ? "上涨" : "下跌"}${Math.abs(projectedChangePct).toFixed(2)}%。20日年化波动率约为 ${Math.round(vol20)}%。`;
+  }
+
+  return `Using ${days} forecast day(s), the model projects ${projectedChangePct >= 0 ? "a rise" : "a decline"} of ${Math.abs(projectedChangePct).toFixed(2)}% from the latest close. 20D annualized volatility is about ${Math.round(vol20)}%.`;
+}
+
+function localizedForecastOutlook(result = {}) {
+  const days = Number(result.forecastDays || 0);
+  const directionText = localizedForecastDirection(result.direction);
+  const endPrice = result.projectionSummary?.endPrice ?? result.historicalSummary?.endPrice ?? "-";
+
+  if (currentLang === "zh") {
+    return `预计未来 ${days} 天走势偏${directionText}，预测期末价格约为 ${endPrice}。`;
+  }
+
+  return `Expected to be ${directionText} over the next ${days} days, with projected end price near ${endPrice}.`;
+}
+
+function addDaysToIso(isoString, days) {
+  const base = isoString ? new Date(isoString) : new Date();
+  const d = new Date(base);
+  d.setDate(d.getDate() + Number(days || 0));
+  return d.toISOString();
+}
+
+function buildProjectedSeriesFromHistory(series = [], ticker = "DEMO", range = "1M", days = 7) {
+  const points = Array.isArray(series) ? series : [];
+  const closes = points.map((p) => Number(p.close)).filter((v) => Number.isFinite(v));
+  if (!closes.length) return [];
+
+  const returns = [];
+  for (let i = 1; i < closes.length; i++) {
+    if (closes[i - 1] !== 0) returns.push(closes[i] / closes[i - 1] - 1);
+  }
+
+  const recentReturns = returns.slice(-Math.min(10, returns.length));
+  const avgReturn = recentReturns.length ? avg(recentReturns) : 0;
+  const vol = recentReturns.length >= 2 ? sampleStd(recentReturns) : 0.01;
+  const seed = hashTickerSeed(`${String(ticker || "DEMO").toUpperCase()}:${range}:${days}:forecast`);
+  const rand = seededRandom(seed);
+  const projected = [];
+  let prevClose = closes[closes.length - 1];
+  let prevDate = points[points.length - 1]?.t || new Date().toISOString();
+  const dayStep = range === "3Y" ? 7 : range === "1Y" ? 3 : 1;
+
+  for (let i = 1; i <= days; i++) {
+    const horizonBoost = Math.min(0.012, Math.abs(avgReturn) * 0.35 * Math.sqrt(i / Math.max(1, days)));
+    const drift = avgReturn * (0.65 + i / Math.max(1, days) * 0.45);
+    const noise = (rand() - 0.5) * Math.max(0.004, vol * 0.9);
+    const directional = avgReturn >= 0 ? horizonBoost : -horizonBoost;
+    const stepReturn = drift + directional + noise;
+    const nextClose = Math.max(1, prevClose * (1 + stepReturn));
+    prevDate = addDaysToIso(prevDate, dayStep);
+    projected.push({
+      t: prevDate,
+      close: Number(nextClose.toFixed(2)),
+      volume: null,
+      projected: true,
+    });
+    prevClose = nextClose;
+  }
+
+  return projected;
+}
+
+function buildProjectionSummary(projectedSeries = [], lastHistoricalClose = null) {
+  const closes = (projectedSeries || []).map((p) => Number(p.close)).filter((v) => Number.isFinite(v));
+  if (!closes.length) return null;
+  const start = Number.isFinite(lastHistoricalClose) ? Number(lastHistoricalClose) : closes[0];
+  const end = closes[closes.length - 1];
+  return {
+    startPrice: Number(start.toFixed(2)),
+    endPrice: Number(end.toFixed(2)),
+    averagePrice: Number(avg(closes).toFixed(2)),
+    highestPrice: Number(Math.max(...closes).toFixed(2)),
+    lowestPrice: Number(Math.min(...closes).toFixed(2)),
+    priceChangePct: Number(pctChange(start, end).toFixed(2)),
+    totalDataDays: closes.length,
+  };
+}
+
+function mergeForecastRiskSeries(historySeries = [], projectedSeries = []) {
+  const histCloses = (historySeries || []).map((p) => Number(p.close)).filter((v) => Number.isFinite(v));
+  const projectedCloses = (projectedSeries || []).map((p) => Number(p.close)).filter((v) => Number.isFinite(v));
+  const combined = [...histCloses, ...projectedCloses];
+  if (!combined.length) return [];
+  const series = computeRiskSeriesFromCloses(combined);
+  const maxPoints = 48;
+  if (series.length <= maxPoints) return series;
+  const step = (series.length - 1) / (maxPoints - 1);
+  const sampled = [];
+  for (let i = 0; i < maxPoints; i++) {
+    sampled.push(series[Math.round(i * step)]);
+  }
+  return sampled;
+}
+
+function buildClientForecastResult(ticker, range, days, hist) {
+  const summary = buildHistorySummary(hist.series || []);
+  const metrics = buildDynamicAnalyticsFromHistory(hist.series || [], 0);
+  const projectedSeries = buildProjectedSeriesFromHistory(hist.series || [], ticker, range, days);
+  const projectionSummary = buildProjectionSummary(projectedSeries, Number(summary.endPrice));
+  const projectedChangePct = Number(projectionSummary?.priceChangePct || 0);
+  const vol20 = Number(metrics.vol20 || 0);
+  const direction = projectedChangePct > 1.5 ? "Bullish" : projectedChangePct < -1.5 ? "Bearish" : "Sideways";
+  const confidence = days >= 20
+    ? (vol20 > 42 ? "Low" : "Medium")
+    : (Math.abs(projectedChangePct) > 3 && vol20 < 38 ? "High" : vol20 > 48 ? "Low" : "Medium");
+  const dateRange = `${String(hist.series?.[0]?.t || "").slice(0, 10)} to ${String(hist.series?.[hist.series.length - 1]?.t || "").slice(0, 10)}`;
+  const forecastEnd = String(projectedSeries?.[projectedSeries.length - 1]?.t || hist.series?.[hist.series.length - 1]?.t || "").slice(0, 10);
+  const analysis = `Using ${days} forecast day(s), the model projects ${projectedChangePct >= 0 ? "a rise" : "a decline"} of ${Math.abs(projectedChangePct).toFixed(2)}% from the latest close. 20D annualized volatility is about ${Math.round(vol20)}%.`;
+  const forecast = `Expected to be ${direction} over the next ${days} days, with projected end price near ${projectionSummary?.endPrice ?? summary.endPrice}.`;
+
+  return {
+    ticker: String(ticker || "").trim().toUpperCase(),
+    range,
+    forecastDays: days,
+    generatedAt: new Date().toISOString(),
+    status: "ok",
+    source: "Integrated browser forecast",
+    dateRange,
+    forecastEnd,
+    historicalSummary: summary,
+    projectionSummary,
+    historySeries: hist.series || [],
+    recentSample: (hist.series || []).slice(-10),
+    method: "rule-based browser forecast",
+    metrics,
+    projectedChangePct,
+    direction,
+    analysis,
+    forecast,
+    confidence,
+    keyFactors: shortForecastFactors(metrics, projectedChangePct, days, currentLang),
+    projectedSeries,
+    chartRiskSeries: mergeForecastRiskSeries(hist.series || [], projectedSeries),
+  };
+}
+
+function seriesSignature(series = []) {
+  const points = (series || []).map((p) => Number(p?.close)).filter((v) => Number.isFinite(v));
+  if (!points.length) return "empty";
+  const take = (arr, n) => arr.slice(0, n).concat(arr.slice(-n));
+  return `${points.length}|${take(points, 3).map((v) => v.toFixed(2)).join(",")}`;
+}
+
+async function fetchForecast(ticker, range, days) {
+  try {
+    const hist = await fetchHistory(ticker, range);
+    return buildClientForecastResult(ticker, range, days, hist);
+  } catch (e) {
+    const hist = generateOfflineHistory(ticker, range);
+    return buildClientForecastResult(ticker, range, days, hist);
+  }
+}
+
+function applyForecastVisuals(result) {
+  try {
+    drawTrendChart("s1", result.historySeries || [], result.projectedSeries || [], result.ticker || selectedTicker);
+    drawTrendChart("s2", result.historySeries || [], result.projectedSeries || [], result.ticker || selectedTicker);
+
+    const s1RangeLabel = document.getElementById("s1RangeLabel");
+    if (s1RangeLabel) s1RangeLabel.textContent = `${t("range_label")} ${currentRange} + ${result.forecastDays}D`;
+    const s2RangeLabel = document.getElementById("s2RangeLabel");
+    if (s2RangeLabel) s2RangeLabel.textContent = `${t("range_label")} ${currentRange} + ${result.forecastDays}D`;
+
+    const s1End = document.getElementById("s1XEnd");
+    const s2End = document.getElementById("s2XEnd");
+    if (s1End && result.forecastEnd) s1End.textContent = fmtDateShort(result.forecastEnd);
+    if (s2End && result.forecastEnd) s2End.textContent = fmtDateShort(result.forecastEnd);
+  } catch (e) {
+    console.error("applyForecastVisuals failed:", e);
+  }
+}
+
+function renderForecastCard(result) {
+  lastForecastResult = result || null;
+
+  const tickerLabel = document.getElementById("forecastTickerLabel");
+  if (tickerLabel && result) tickerLabel.textContent = currentLang === "zh" ? `${result.ticker} • ${result.forecastDays}天` : `${result.ticker} • ${result.forecastDays}D`;
+
+  const status = document.getElementById("forecastStatus");
+  if (status && result) {
+    const horizonText = currentLang === "zh" ? `预测期 ${result.forecastDays}天` : `Horizon ${result.forecastDays}D`;
+    status.textContent = `${result.dateRange} • ${localizedForecastSource(result)} • ${horizonText}`;
+  }
+
+  const analysis = document.getElementById("forecastAnalysis");
+  if (analysis) analysis.textContent = result ? localizedForecastAnalysis(result) : "-";
+
+  const outlook = document.getElementById("forecastOutlook");
+  if (outlook) outlook.textContent = result ? localizedForecastOutlook(result) : "-";
+
+  const confidence = document.getElementById("forecastConfidence");
+  if (confidence) {
+    confidence.className = `badge ${forecastConfidenceBadgeClass(result?.confidence)}`;
+    confidence.textContent = forecastConfidenceLabel(result?.confidence);
+  }
+
+  const method = document.getElementById("forecastMethod");
+  if (method) method.textContent = localizedForecastMethod(result?.method);
+
+  const factors = document.getElementById("forecastFactors");
+  if (factors) {
+    const factorList = result ? shortForecastFactors(result.metrics || {}, Number(result.projectedChangePct || 0), Number(result.forecastDays || currentForecastDays || 7), currentLang) : [];
+    factors.innerHTML = factorList.map((item) => `<div class="driver">${escapeHtml(item)}</div>`).join("");
+  }
+
+  const summary = document.getElementById("forecastSummary");
+  if (summary) {
+    const summaryData = result?.projectionSummary || result?.historicalSummary || {};
+    summary.innerHTML = forecastSummaryEntries(summaryData).map(([label, value]) => `
+      <div class="forecast-summary-row">
+        <div class="label">${escapeHtml(label)}</div>
+        <div class="value">${escapeHtml(String(value))}</div>
+      </div>
+    `).join("");
+  }
+
+  applyForecastVisuals(result);
+}
+
+function downloadForecastCsv() {
+  if (!lastForecastResult) {
+    alert(t("fc_export_empty"));
+    return;
+  }
+
+  const r = lastForecastResult;
+  const rows = [
+    ["Ticker", r.ticker],
+    ["Range", r.range],
+    ["Forecast Days", r.forecastDays],
+    ["Date Range", r.dateRange],
+    ["Method", r.method],
+    ["Confidence", r.confidence],
+    ["Analysis", r.analysis],
+    ["Forecast", r.forecast],
+    ["Key Factors", (r.keyFactors || []).join(" | ")],
+    ["Start Price", r.historicalSummary?.startPrice],
+    ["End Price", r.historicalSummary?.endPrice],
+    ["Average Price", r.historicalSummary?.averagePrice],
+    ["Highest Price", r.historicalSummary?.highestPrice],
+    ["Lowest Price", r.historicalSummary?.lowestPrice],
+    ["Price Change (%)", r.historicalSummary?.priceChangePct],
+    ["Total Data Days", r.historicalSummary?.totalDataDays],
+    ["Generated At", r.generatedAt],
+  ];
+
+  const csv = rows.map((row) => row.map((cell) => {
+    const value = cell == null ? "" : String(cell);
+    return `"${value.replaceAll('"', '""')}"`;
+  }).join(",")).join("\n");
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `forecast_${r.ticker}_${r.forecastDays}d.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  alert(t("fc_export_done"));
+}
+
+async function requestAndRenderForecast(ticker = selectedTicker, range = currentRange, days = currentForecastDays) {
+  const status = document.getElementById("forecastStatus");
+  if (status) status.textContent = t("fc_loading");
+
+  try {
+    const result = await fetchForecast(ticker, range, days);
+    renderForecastCard(result);
+    return result;
+  } catch (e) {
+    console.error("Forecast failed:", e);
+    if (status) status.textContent = t("fc_error");
+    return null;
+  }
+}
+
 async function fetchHistory(ticker, range) {
-  const r = await fetch(`/api/history?t=${encodeURIComponent(ticker)}&range=${encodeURIComponent(range)}`);
-  if (!r.ok) throw new Error("history fetch failed");
-  return r.json();
+  const requestedTicker = String(ticker || "").trim().toUpperCase();
+  const requestedRange = String(range || "1M").toUpperCase();
+
+  if (FORCE_LOCAL_DEMO_HISTORY) {
+    const local = generateOfflineHistory(requestedTicker, requestedRange);
+    lastFetchedHistoryMeta = {
+      ticker: requestedTicker,
+      range: requestedRange,
+      signature: seriesSignature(local.series || [])
+    };
+    return local;
+  }
+
+  try {
+    const url = `/api/history?t=${encodeURIComponent(requestedTicker)}&range=${encodeURIComponent(requestedRange)}&_=${Date.now()}`;
+    const r = await fetch(url, {
+      cache: "no-store",
+      headers: {
+        "Cache-Control": "no-cache, no-store, max-age=0",
+        Pragma: "no-cache"
+      }
+    });
+    if (!r.ok) throw new Error("history fetch failed");
+    const data = await r.json();
+    const returnedTicker = String(data?.ticker || "").trim().toUpperCase();
+    const sig = seriesSignature(data?.series || []);
+
+    if (returnedTicker && returnedTicker !== requestedTicker) {
+      throw new Error(`history ticker mismatch: expected ${requestedTicker}, got ${returnedTicker}`);
+    }
+
+    if (
+      lastFetchedHistoryMeta &&
+      lastFetchedHistoryMeta.ticker !== requestedTicker &&
+      lastFetchedHistoryMeta.range === requestedRange &&
+      lastFetchedHistoryMeta.signature === sig
+    ) {
+      const fallback = generateOfflineHistory(requestedTicker, requestedRange);
+      lastFetchedHistoryMeta = { ticker: requestedTicker, range: requestedRange, signature: seriesSignature(fallback.series || []) };
+      return fallback;
+    }
+
+    lastFetchedHistoryMeta = { ticker: requestedTicker, range: requestedRange, signature: sig };
+    return data;
+  } catch (e) {
+    const fallback = generateOfflineHistory(requestedTicker, requestedRange);
+    lastFetchedHistoryMeta = { ticker: requestedTicker, range: requestedRange, signature: seriesSignature(fallback.series || []) };
+    return fallback;
+  }
 }
 
-// ----- Compute risk series -----
 function computeRiskSeriesFromCloses(closes) {
   const n = closes.length;
   if (n < 3) return closes.map(() => 0);
@@ -732,187 +1414,253 @@ function computeRiskSeriesFromCloses(closes) {
   return scores;
 }
 
-// ----- Draw line -----
-function drawLine(svgId, lineId, dotId, textId, series) {
-  const svg = document.getElementById(svgId);
-  const line = document.getElementById(lineId);
-  const dot = document.getElementById(dotId);
-  const label = document.getElementById(textId);
-  if (!svg || !line || !dot || !label || !series?.length) return;
+function formatChartPrice(value) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return "-";
+  if (Math.abs(num) >= 1000) return num.toFixed(0);
+  if (Math.abs(num) >= 100) return num.toFixed(1);
+  if (Math.abs(num) >= 10) return num.toFixed(2);
+  return num.toFixed(2);
+}
+
+function drawTrendChart(prefix, historySeries = [], projectedSeries = [], labelTicker = selectedTicker) {
+  const svg = document.getElementById(`${prefix}Chart`);
+  const histLine = document.getElementById(`${prefix}HistLine`);
+  const projLine = document.getElementById(`${prefix}ProjLine`);
+  const forecastArea = document.getElementById(`${prefix}ForecastArea`);
+  const projStart = document.getElementById(`${prefix}ProjStart`);
+  const dot = document.getElementById(`${prefix}Dot`);
+  const latest = document.getElementById(`${prefix}LastText`);
+  const xLabel = document.getElementById(`${prefix}XLabel`);
+  const yLabel = document.getElementById(`${prefix}YLabel`);
+  if (!svg || !histLine || !projLine || !forecastArea || !projStart || !dot || !latest) return;
 
   const vb = svg.viewBox?.baseVal;
-  const w = vb?.width || 600;
-  const h = vb?.height || 220;
+  const w = vb?.width || 1040;
+  const h = vb?.height || 380;
+  const isLarge = prefix === "s1";
+  const padLeft = 110;
+  const padRight = 76;
+  const padTop = isLarge ? 82 : 76;
+  const padBottom = isLarge ? 78 : 76;
+  const innerW = w - padLeft - padRight;
+  const innerH = h - padTop - padBottom;
 
-  const padX = 20;
-  const padY = 30;
+  const history = (historySeries || []).map((p) => ({
+    t: p?.t,
+    close: Number(p?.close),
+    projected: false,
+  })).filter((p) => Number.isFinite(p.close));
+  const projected = (projectedSeries || []).map((p) => ({
+    t: p?.t,
+    close: Number(p?.close),
+    projected: true,
+  })).filter((p) => Number.isFinite(p.close));
+
+  const all = [...history, ...projected];
+  if (!all.length) return;
+
+  let minV = Math.min(...all.map((p) => p.close));
+  let maxV = Math.max(...all.map((p) => p.close));
+  const span = Math.max(1, maxV - minV);
+  const padValue = Math.max(1, span * 0.12);
+  minV = Math.max(0, minV - padValue);
+  maxV = maxV + padValue;
+
+  const totalPoints = Math.max(1, all.length - 1);
+  const pointToXY = (point, idx) => {
+    const x = padLeft + (idx / totalPoints) * innerW;
+    const y = padTop + (1 - ((point.close - minV) / Math.max(1e-9, maxV - minV))) * innerH;
+    return { x, y };
+  };
+
+  const histPtsArr = history.map((p, i) => pointToXY(p, i));
+  const projPtsArr = projected.map((p, i) => pointToXY(p, history.length - 1 + i + 1));
+
+  histLine.setAttribute("points", histPtsArr.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" "));
+  histLine.style.display = histPtsArr.length ? "block" : "none";
+
+  if (projected.length && histPtsArr.length) {
+    const projPath = [histPtsArr[histPtsArr.length - 1], ...projPtsArr];
+    projLine.setAttribute("points", projPath.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" "));
+    projLine.style.display = "block";
+
+    const lastHist = histPtsArr[histPtsArr.length - 1];
+    const areaPoints = [
+      `${lastHist.x.toFixed(1)},${(padTop + innerH).toFixed(1)}`,
+      `${lastHist.x.toFixed(1)},${lastHist.y.toFixed(1)}`,
+      ...projPtsArr.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`),
+      `${projPtsArr[projPtsArr.length - 1].x.toFixed(1)},${(padTop + innerH).toFixed(1)}`,
+    ];
+    forecastArea.setAttribute("points", areaPoints.join(" "));
+    forecastArea.style.display = "block";
+
+    projStart.setAttribute("cx", lastHist.x.toFixed(1));
+    projStart.setAttribute("cy", lastHist.y.toFixed(1));
+    projStart.style.display = "block";
+  } else {
+    projLine.setAttribute("points", "");
+    projLine.style.display = "none";
+    forecastArea.setAttribute("points", "");
+    forecastArea.style.display = "none";
+    projStart.style.display = "none";
+  }
+
+  const latestPoint = projPtsArr[projPtsArr.length - 1] || histPtsArr[histPtsArr.length - 1];
+  const latestValue = projected[projected.length - 1]?.close ?? history[history.length - 1]?.close ?? 0;
+  if (latestPoint) {
+    dot.setAttribute("cx", latestPoint.x.toFixed(1));
+    dot.setAttribute("cy", latestPoint.y.toFixed(1));
+    dot.style.display = "block";
+  }
+
+  latest.textContent = `${t("latest")} ${formatChartPrice(latestValue)}`;
+  latest.setAttribute("x", "24");
+  latest.setAttribute("y", isLarge ? "74" : "68");
+
+  if (yLabel) {
+    yLabel.textContent = buildPreviewTickerLabel(labelTicker || selectedTicker, currentRange);
+    yLabel.setAttribute("x", "24");
+    yLabel.setAttribute("y", "40");
+    yLabel.removeAttribute("transform");
+  }
+
+  if (xLabel) {
+    xLabel.textContent = currentLang === "zh" ? "时间" : "Time";
+    xLabel.setAttribute("x", String(padLeft + innerW / 2));
+    xLabel.setAttribute("y", String(h - 14));
+  }
+
+  const tickTop = document.getElementById(`${prefix}YTick100`);
+  const tickMid = document.getElementById(`${prefix}YTick50`);
+  const tickBot = document.getElementById(`${prefix}YTick0`);
+  const gridTop = document.getElementById(`${prefix}GridTop`);
+  const gridMid = document.getElementById(`${prefix}GridMid`);
+  const gridBot = document.getElementById(`${prefix}GridBot`);
+  const axisX = document.getElementById(`${prefix}AxisX`);
+  const axisY = document.getElementById(`${prefix}AxisY`);
+  const xStart = document.getElementById(`${prefix}XStart`);
+  const xMid = document.getElementById(`${prefix}XMid`);
+  const xEnd = document.getElementById(`${prefix}XEnd`);
+
+  const yTop = padTop;
+  const yMid = padTop + innerH / 2;
+  const yBot = padTop + innerH;
+  const xStartPos = padLeft;
+  const xMidPos = padLeft + innerW / 2;
+  const xEndPos = padLeft + innerW;
+
+  if (tickTop) {
+    tickTop.textContent = formatChartPrice(maxV);
+    tickTop.setAttribute("x", String(padLeft - 18));
+    tickTop.setAttribute("y", String(yTop + 6));
+  }
+  if (tickMid) {
+    tickMid.textContent = formatChartPrice((maxV + minV) / 2);
+    tickMid.setAttribute("x", String(padLeft - 18));
+    tickMid.setAttribute("y", String(yMid + 6));
+  }
+  if (tickBot) {
+    tickBot.textContent = formatChartPrice(minV);
+    tickBot.setAttribute("x", String(padLeft - 18));
+    tickBot.setAttribute("y", String(yBot + 6));
+  }
+
+  for (const [el, yy] of [[gridTop, yTop], [gridMid, yMid], [gridBot, yBot]]) {
+    if (el) {
+      el.setAttribute("x1", String(padLeft));
+      el.setAttribute("x2", String(xEndPos));
+      el.setAttribute("y1", String(yy));
+      el.setAttribute("y2", String(yy));
+    }
+  }
+  if (axisX) {
+    axisX.setAttribute("x1", String(padLeft));
+    axisX.setAttribute("x2", String(xEndPos));
+    axisX.setAttribute("y1", String(yBot));
+    axisX.setAttribute("y2", String(yBot));
+  }
+  if (axisY) {
+    axisY.setAttribute("x1", String(padLeft));
+    axisY.setAttribute("x2", String(padLeft));
+    axisY.setAttribute("y1", String(yTop));
+    axisY.setAttribute("y2", String(yBot));
+  }
+
+  const firstDate = all[0]?.t;
+  const midDate = all[Math.floor((all.length - 1) / 2)]?.t;
+  const lastDate = all[all.length - 1]?.t;
+  if (xStart) {
+    xStart.textContent = firstDate ? fmtDateShort(firstDate) : t("start");
+    xStart.setAttribute("x", String(xStartPos));
+    xStart.setAttribute("y", String(yBot + 34));
+  }
+  if (xMid) {
+    xMid.textContent = midDate ? fmtDateShort(midDate) : t("middle");
+    xMid.setAttribute("x", String(xMidPos));
+    xMid.setAttribute("y", String(yBot + 34));
+  }
+  if (xEnd) {
+    xEnd.textContent = lastDate ? fmtDateShort(lastDate) : t("end");
+    xEnd.setAttribute("x", String(xEndPos));
+    xEnd.setAttribute("y", String(yBot + 34));
+  }
+}
+
+
+function buildMiniChartSvg(series) {
+  const values = (series || []).map(v => Number(v)).filter(v => Number.isFinite(v));
+  if (!values.length) return "";
+
+  const w = 520;
+  const h = 170;
+  const padX = 28;
+  const padY = 20;
   const innerW = w - padX * 2;
   const innerH = h - padY * 2;
 
-  const ptsArr = series.map((v, i) => {
-    const x = padX + (i / Math.max(1, series.length - 1)) * innerW;
-    const y = padY + (1 - v / 100) * innerH;
+  let minV = Math.min(...values);
+  let maxV = Math.max(...values);
+
+  if (maxV - minV < 8) {
+    const mid = (maxV + minV) / 2;
+    minV = Math.max(0, mid - 6);
+    maxV = Math.min(100, mid + 6);
+  } else {
+    minV = Math.max(0, minV - 3);
+    maxV = Math.min(100, maxV + 3);
+  }
+
+  const points = values.map((v, i) => {
+    const x = padX + (i / Math.max(1, values.length - 1)) * innerW;
+    const y = padY + (1 - (v - minV) / Math.max(1, maxV - minV)) * innerH;
     return `${x.toFixed(1)},${y.toFixed(1)}`;
-  });
+  }).join(" ");
 
-  line.setAttribute("points", ptsArr.join(" "));
+  const last = values[values.length - 1];
 
-  const last = series[series.length - 1];
-  const prev = series[series.length - 2] ?? last;
-  const up = last - prev;
+  return `
+    <svg viewBox="0 0 520 170" class="report-mini-chart" preserveAspectRatio="none">
+      <line x1="28" y1="20" x2="492" y2="20" class="report-grid-line"></line>
+      <line x1="28" y1="85" x2="492" y2="85" class="report-grid-line"></line>
+      <line x1="28" y1="150" x2="492" y2="150" class="report-grid-line"></line>
 
-  line.style.stroke =
-    up > 0 ? "rgba(90,255,160,0.95)" :
-    up < 0 ? "rgba(255,90,120,0.95)" :
-    "rgba(255,255,255,0.75)";
-  dot.style.fill = line.style.stroke;
+      <line x1="28" y1="20" x2="28" y2="150" class="report-axis-line"></line>
+      <line x1="28" y1="150" x2="492" y2="150" class="report-axis-line"></line>
 
-  const [cx, cy] = ptsArr[ptsArr.length - 1].split(",");
-  dot.setAttribute("cx", cx);
-  dot.setAttribute("cy", cy);
+      <polyline points="${points}" class="report-mini-line"></polyline>
+      <circle cx="${points.split(" ").slice(-1)[0].split(",")[0]}" cy="${points.split(" ").slice(-1)[0].split(",")[1]}" r="4.5" class="report-mini-dot"></circle>
 
-  label.textContent = `${currentLang === "zh" ? "最新：" : "Latest: "}${last}`;
+      <text x="14" y="24" class="report-axis-text">${Math.round(maxV)}</text>
+      <text x="14" y="89" class="report-axis-text">${Math.round((maxV + minV) / 2)}</text>
+      <text x="14" y="154" class="report-axis-text">${Math.round(minV)}</text>
+
+      <text x="260" y="166" text-anchor="middle" class="report-axis-text">${escapeHtml(t("axis_time"))}</text>
+      <text x="40" y="18" class="report-axis-text">${escapeHtml(t("latest"))} ${last}</text>
+    </svg>
+  `;
 }
 
-// ----- Compare charts -----
-function renderCompareRanking() {
-  const box = document.getElementById("cmpRankingChart");
-  if (!box) return;
-
-  const items = compareList
-    .map(t => STOCKS[t])
-    .filter(Boolean)
-    .sort((a, b) => b.score - a.score);
-
-  if (!items.length) {
-    box.innerHTML = `<div class="muted">${currentLang === "zh" ? "暂无数据" : "No data"}</div>`;
-    return;
-  }
-
-  box.innerHTML = items.map(s => `
-    <div class="cmp-rank-row">
-      <div class="cmp-rank-name">${escapeHtml(s.ticker)}</div>
-      <div class="cmp-rank-bar-wrap">
-        <div class="cmp-rank-bar" style="width:${Math.max(4, Number(s.score) || 0)}%"></div>
-      </div>
-      <div class="cmp-rank-score">${safeText(s.score, 0)}</div>
-    </div>
-  `).join("");
-}
-
-function renderCompareTrend() {
-  const svg = document.getElementById("cmpTrendChart");
-  const linesGroup = document.getElementById("cmpTrendLines");
-  const dotsGroup = document.getElementById("cmpTrendDots");
-  const labelsGroup = document.getElementById("cmpTrendLabels");
-  if (!svg || !linesGroup || !dotsGroup || !labelsGroup) return;
-
-  linesGroup.innerHTML = "";
-  dotsGroup.innerHTML = "";
-  labelsGroup.innerHTML = "";
-
-  const items = compareList.map(t => STOCKS[t]).filter(Boolean);
-  if (!items.length) return;
-
-  const xStartEl = document.getElementById("cmpXStart");
-  const xMidEl = document.getElementById("cmpXMid");
-  const xEndEl = document.getElementById("cmpXEnd");
-  const labels = getCompareXLabels(currentRange);
-
-  if (xStartEl) xStartEl.textContent = labels.start;
-  if (xMidEl) xMidEl.textContent = labels.mid;
-  if (xEndEl) xEndEl.textContent = labels.end;
-
-  const colors = [
-    "rgba(255,255,255,0.92)",
-    "rgba(90,255,160,0.95)",
-    "rgba(255,90,120,0.95)",
-    "rgba(120,180,255,0.95)",
-    "rgba(255,210,90,0.95)",
-    "rgba(190,140,255,0.95)"
-  ];
-
-  const left = 70;
-  const right = 580;
-  const top = 40;
-  const bottom = 220;
-  const width = right - left;
-  const height = bottom - top;
-
-  const endLabels = [];
-
-  items.forEach((s, idx) => {
-    const series = buildCompareSeries(s);
-
-    const pts = series.map((v, i) => {
-      const x = left + (i / Math.max(1, series.length - 1)) * width;
-      const y = bottom - (v / 100) * height;
-      return { x, y, v };
-    });
-
-    const poly = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-    poly.setAttribute("points", pts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" "));
-    poly.setAttribute("class", "cmp-trend-line");
-    poly.setAttribute("stroke", colors[idx % colors.length]);
-    linesGroup.appendChild(poly);
-
-    pts.forEach((p, pointIdx) => {
-      const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-      dot.setAttribute("cx", p.x.toFixed(1));
-      dot.setAttribute("cy", p.y.toFixed(1));
-      dot.setAttribute("r", pointIdx === pts.length - 1 ? "4.5" : "3");
-      dot.setAttribute("fill", colors[idx % colors.length]);
-      dotsGroup.appendChild(dot);
-    });
-
-    const last = pts[pts.length - 1];
-    endLabels.push({
-      ticker: s.ticker,
-      x: last.x + 10,
-      y: last.y,
-      color: colors[idx % colors.length]
-    });
-  });
-
-  endLabels.sort((a, b) => a.y - b.y);
-
-  const minGap = 18;
-  for (let i = 1; i < endLabels.length; i++) {
-    if (endLabels[i].y - endLabels[i - 1].y < minGap) {
-      endLabels[i].y = endLabels[i - 1].y + minGap;
-    }
-  }
-
-  const maxY = bottom - 2;
-  const minY = top + 8;
-  for (let i = endLabels.length - 1; i >= 0; i--) {
-    if (endLabels[i].y > maxY) endLabels[i].y = maxY - (endLabels.length - 1 - i) * minGap;
-  }
-  for (let i = 0; i < endLabels.length; i++) {
-    if (endLabels[i].y < minY) endLabels[i].y = minY + i * minGap;
-  }
-
-  endLabels.forEach(lbl => {
-    const connector = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    connector.setAttribute("x1", "580");
-    connector.setAttribute("y1", lbl.y.toFixed(1));
-    connector.setAttribute("x2", "592");
-    connector.setAttribute("y2", lbl.y.toFixed(1));
-    connector.setAttribute("stroke", lbl.color);
-    connector.setAttribute("stroke-width", "1.5");
-    labelsGroup.appendChild(connector);
-
-    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    text.setAttribute("x", "596");
-    text.setAttribute("y", (lbl.y + 4).toFixed(1));
-    text.setAttribute("class", "cmp-trend-label");
-    text.setAttribute("fill", lbl.color);
-    text.textContent = lbl.ticker;
-    labelsGroup.appendChild(text);
-  });
-}
-
-// ----- Prediction skeleton -----
 function predictRisk(ticker) {
   ticker = (ticker || "").trim().toUpperCase();
 
@@ -921,8 +1669,6 @@ function predictRisk(ticker) {
   const conf = Number(base.conf ?? 76);
   const d7 = Number(base.d7 ?? -7);
   const level = base.level || deriveLevelFromScore(baseScore);
-
-  const rules = { high: 12, medLo: 6, medHi: 12, low: 6 };
   const metrics = buildDefaultMetricsFromSeed(baseScore, d7);
 
   return {
@@ -932,16 +1678,16 @@ function predictRisk(ticker) {
     conf,
     d7,
     level,
-    rules,
+    rules: { high: 12, medLo: 6, medHi: 12, low: 6 },
     metrics,
     breakdown: metrics.breakdown,
-    drivers: buildDriversFromMetrics(metrics, level, currentLang),
+    drivers: buildDriversFromMetrics(metrics, level),
+    advice: "",
     series: Array(20).fill(baseScore),
     xMeta: null
   };
 }
 
-// ----- Online prediction -----
 async function predictRiskOnline(ticker, range) {
   const pred = predictRisk(ticker);
 
@@ -958,9 +1704,7 @@ async function predictRiskOnline(ticker, range) {
 
   try {
     const hist = await fetchHistory(pred.ticker, range);
-    const closes = (hist.series || [])
-      .map(p => Number(p.close))
-      .filter(v => Number.isFinite(v));
+    const closes = (hist.series || []).map(p => Number(p.close)).filter(v => Number.isFinite(v));
 
     if (closes.length >= 3) {
       pred.series = computeRiskSeriesFromCloses(closes);
@@ -978,29 +1722,74 @@ async function predictRiskOnline(ticker, range) {
 
       pred.xMeta = {
         start: hist.series?.[0]?.t,
+        mid: hist.series?.[Math.floor((hist.series?.length || 1) / 2)]?.t,
         end: hist.series?.[hist.series.length - 1]?.t
       };
 
+      pred.historySeries = hist.series || [];
+      pred.projectedSeries = buildProjectedSeriesFromHistory(hist.series || [], pred.ticker, range, currentForecastDays);
       pred.metrics = buildDynamicAnalyticsFromHistory(hist.series || [], pred.d7);
       pred.breakdown = pred.metrics.breakdown;
       pred.conf = computeConfidenceFromHistory(closes.length, pred.metrics);
-      pred.drivers = buildDriversFromMetrics(pred.metrics, pred.level, currentLang);
+      pred.drivers = buildDriversFromMetrics(pred.metrics, pred.level);
     } else {
+      pred.historySeries = [];
+      pred.projectedSeries = [];
       pred.metrics = buildDefaultMetricsFromSeed(pred.score, pred.d7);
       pred.breakdown = pred.metrics.breakdown;
-      pred.drivers = buildDriversFromMetrics(pred.metrics, pred.level, currentLang);
+      pred.drivers = buildDriversFromMetrics(pred.metrics, pred.level);
     }
   } catch (e) {
     console.warn("Online history failed:", e?.message || e);
+    pred.historySeries = [];
+    pred.projectedSeries = [];
     pred.metrics = buildDefaultMetricsFromSeed(pred.score, pred.d7);
     pred.breakdown = pred.metrics.breakdown;
-    pred.drivers = buildDriversFromMetrics(pred.metrics, pred.level, currentLang);
+    pred.drivers = buildDriversFromMetrics(pred.metrics, pred.level);
   }
 
+  pred.advice = buildActionAdvice(pred);
   return pred;
 }
 
-// ----- Apply prediction to UI -----
+function renderDriversPanel(pred) {
+  const wrap = document.getElementById("s2DriversList");
+  if (!wrap) return;
+
+  wrap.innerHTML = (pred.drivers || []).map(txt => `
+    <div class="driver">${escapeHtml(txt)}</div>
+  `).join("");
+}
+
+function renderBreakdownAndMetrics(pred) {
+  const bd = pred?.metrics?.breakdown || pred?.breakdown || { market: 35, drawdown: 30, vol: 25, liq: 10 };
+  const m = pred?.metrics || {};
+
+  const set = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  };
+
+  set("bdMarketVal", `${Math.round(bd.market)}%`);
+  set("bdDrawdownVal", `${Math.round(bd.drawdown)}%`);
+  set("bdVolVal", `${Math.round(bd.vol)}%`);
+  set("bdLiqVal", `${Math.round(bd.liq)}%`);
+
+  set("metricVol20Val", `${Math.round(Number(m.vol20 || 0))}%`);
+  set("metricVol60Val", `${Math.round(Number(m.vol60 || 0))}%`);
+  set("metricMdd6mVal", `${Number(m.mdd6m || 0).toFixed(1)}%`);
+  set("metricBetaVal", Number(m.beta || 0).toFixed(2));
+  set("metricVolChgVal", `${Number(m.volChgPct || 0) >= 0 ? "↑" : "↓"} ${Math.abs(Number(m.volChgPct || 0)).toFixed(0)}%`);
+
+  const volChgEl = document.getElementById("metricVolChgVal");
+  if (volChgEl) {
+    volChgEl.classList.remove("pos", "neg", "neu");
+    if (Number(m.volChgPct || 0) > 0) volChgEl.classList.add("pos");
+    else if (Number(m.volChgPct || 0) < 0) volChgEl.classList.add("neg");
+    else volChgEl.classList.add("neu");
+  }
+}
+
 function applyPrediction(pred) {
   if (!STOCKS[pred.ticker]) {
     STOCKS[pred.ticker] = {
@@ -1054,9 +1843,7 @@ function applyPrediction(pred) {
   }
 
   const s1Explain = document.getElementById("s1Explain");
-  if (s1Explain) {
-    s1Explain.textContent = buildSummaryText(pred);
-  }
+  if (s1Explain) s1Explain.textContent = buildSummaryText(pred);
 
   const s2HeaderStock = document.getElementById("s2HeaderStock");
   if (s2HeaderStock) s2HeaderStock.textContent = `${pred.ticker} — ${shownName}`;
@@ -1080,65 +1867,37 @@ function applyPrediction(pred) {
   }
 
   const s2Meaning = document.getElementById("s2Meaning");
-  if (s2Meaning) {
-    s2Meaning.textContent =
-      pred.level === "HIGH"
-        ? (currentLang === "zh"
-            ? `该股票短期下行风险较高，主要受波动与回撤压力影响。`
-            : `This stock shows higher downside risk in the near term, mainly driven by volatility and drawdown pressure.`)
-        : pred.level === "MEDIUM"
-        ? (currentLang === "zh"
-            ? `该股票风险中等，短期信号较混合，建议结合更多信息判断。`
-            : `This stock shows moderate risk with mixed short-term signals.`)
-        : (currentLang === "zh"
-            ? `该股票风险较低，近期表现相对稳定，但仍需关注市场变化。`
-            : `This stock shows lower risk based on recent stability.`);
-  }
+  if (s2Meaning) s2Meaning.textContent = buildSummaryText(pred);
 
   renderDriversPanel(pred);
   renderBreakdownAndMetrics(pred);
 
   const s1RangeLabel = document.getElementById("s1RangeLabel");
-  if (s1RangeLabel) s1RangeLabel.textContent = `${currentLang === "zh" ? "范围：" : "Range: "}${currentRange}`;
+  if (s1RangeLabel) s1RangeLabel.textContent = `${t("range_label")} ${currentRange}`;
 
   const s2RangeLabel = document.getElementById("s2RangeLabel");
-  if (s2RangeLabel) s2RangeLabel.textContent = `${currentLang === "zh" ? "范围：" : "Range: "}${currentRange}`;
+  if (s2RangeLabel) s2RangeLabel.textContent = `${t("range_label")} ${currentRange}`;
 
-  const xLabel = currentLang === "zh" ? `时间（范围：${currentRange}）` : `Time (Range: ${currentRange})`;
-  const yLabel = currentLang === "zh" ? "风险评分（0–100）" : "Risk Score (0–100)";
-
-  const s1X = document.getElementById("s1XLabel");
-  const s1Y = document.getElementById("s1YLabel");
-  if (s1X) s1X.textContent = xLabel;
-  if (s1Y) s1Y.textContent = yLabel;
-
-  const s1Start = document.getElementById("s1XStart");
-  const s1End = document.getElementById("s1XEnd");
-  if (s1Start) s1Start.textContent = pred.xMeta?.start ? fmtDateShort(pred.xMeta.start) : (currentLang === "zh" ? "开始" : "Start");
-  if (s1End) s1End.textContent = pred.xMeta?.end ? fmtDateShort(pred.xMeta.end) : (currentLang === "zh" ? "结束" : "End");
-
-  const s2X = document.getElementById("s2XLabel");
-  const s2Y = document.getElementById("s2YLabel");
-  if (s2X) s2X.textContent = xLabel;
-  if (s2Y) s2Y.textContent = yLabel;
-
-  const s2Start = document.getElementById("s2XStart");
-  const s2End = document.getElementById("s2XEnd");
-  if (s2Start) s2Start.textContent = pred.xMeta?.start ? fmtDateShort(pred.xMeta.start) : (currentLang === "zh" ? "开始" : "Start");
-  if (s2End) s2End.textContent = pred.xMeta?.end ? fmtDateShort(pred.xMeta.end) : (currentLang === "zh" ? "结束" : "End");
-
-  drawLine("s1Chart", "s1Line", "s1Dot", "s1LastText", pred.series);
-  drawLine("s2Chart", "s2Line", "s2Dot", "s2LastText", pred.series);
+  drawTrendChart("s1", pred.historySeries || [], pred.projectedSeries || [], pred.ticker);
+  drawTrendChart("s2", pred.historySeries || [], pred.projectedSeries || [], pred.ticker);
 
   renderWatchlist();
   renderCompare();
+  if (
+    lastForecastResult &&
+    String(lastForecastResult.ticker || "").toUpperCase() === String(pred.ticker || "").toUpperCase() &&
+    String(lastForecastResult.range || currentRange).toUpperCase() === String(currentRange).toUpperCase()
+  ) {
+    renderForecastCard(lastForecastResult);
+  }
 }
 
-// ----- Navigation -----
 function switchView(viewName) {
-  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.view === viewName));
-  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(tbtn => {
+    tbtn.classList.toggle("active", tbtn.dataset.view === viewName);
+  });
 
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
   const el = document.getElementById(`view-${viewName}`);
   if (el) el.classList.add("active");
 
@@ -1147,7 +1906,6 @@ function switchView(viewName) {
   if (viewName === "reports") initReportsDropdown();
 }
 
-// ----- Watchlist -----
 function renderWatchlist() {
   const grid = document.getElementById("watchlistGrid");
   if (!grid) return;
@@ -1156,9 +1914,9 @@ function renderWatchlist() {
   const risk = document.getElementById("wlRiskSelect")?.value || "ALL";
 
   const items = watchlist
-    .map((t) => STOCKS[t])
+    .map(ticker => STOCKS[ticker])
     .filter(Boolean)
-    .filter((s) => {
+    .filter(s => {
       const hit = `${s.ticker} ${s.name}`.toLowerCase().includes(q);
       const riskOk = risk === "ALL" || risk === s.level;
       return hit && riskOk;
@@ -1187,7 +1945,7 @@ function renderWatchlist() {
 
       <div class="w-actions">
         <button class="btn primary" data-action="details" data-ticker="${escapeHtml(s.ticker)}">${currentLang === "zh" ? "查看详情" : "View Details"}</button>
-        <button class="btn" data-action="remove" data-ticker="${escapeHtml(s.ticker)}">${currentLang === "zh" ? "移除" : "Remove"}</button>
+        <button class="btn" data-action="remove" data-ticker="${escapeHtml(s.ticker)}">${t("btn_remove")}</button>
       </div>
     `;
     grid.appendChild(card);
@@ -1199,56 +1957,176 @@ function renderWatchlist() {
       const ticker = btn.dataset.ticker;
 
       if (action === "details") {
+        selectedTicker = ticker;
         const pred = await predictRiskOnline(ticker, currentRange);
         applyPrediction(pred);
+        const searchInput = document.getElementById("s1Search");
+        if (searchInput) searchInput.value = ticker;
+        await requestAndRenderForecast(ticker, currentRange, currentForecastDays);
         switchView("detail");
       }
 
       if (action === "remove") {
-        watchlist = watchlist.filter((t) => t !== ticker);
+        watchlist = watchlist.filter(t => t !== ticker);
         renderWatchlist();
       }
     });
   });
 }
 
-// ----- Compare -----
+function renderCompareRanking() {
+  const box = document.getElementById("cmpRankingChart");
+  if (!box) return;
+
+  const items = compareList
+    .map(ticker => STOCKS[ticker])
+    .filter(Boolean)
+    .sort((a, b) => b.score - a.score);
+
+  if (!items.length) {
+    box.innerHTML = `<div class="muted">${currentLang === "zh" ? "暂无数据" : "No data"}</div>`;
+    return;
+  }
+
+  box.innerHTML = items.map(s => `
+    <div class="cmp-rank-row">
+      <div class="cmp-rank-name">${escapeHtml(s.ticker)}</div>
+      <div class="cmp-rank-bar-wrap">
+        <div class="cmp-rank-bar" style="width:${Math.max(4, Number(s.score) || 0)}%"></div>
+      </div>
+      <div class="cmp-rank-score">${safeText(s.score, 0)}</div>
+    </div>
+  `).join("");
+}
+
+function renderCompareTrend() {
+  const linesGroup = document.getElementById("cmpTrendLines");
+  const dotsGroup = document.getElementById("cmpTrendDots");
+  const labelsGroup = document.getElementById("cmpTrendLabels");
+  if (!linesGroup || !dotsGroup || !labelsGroup) return;
+
+  linesGroup.innerHTML = "";
+  dotsGroup.innerHTML = "";
+  labelsGroup.innerHTML = "";
+
+  const items = compareList.map(ticker => STOCKS[ticker]).filter(Boolean);
+  if (!items.length) return;
+
+  const labels = getCompareXLabels(currentRange);
+  const xStartEl = document.getElementById("cmpXStart");
+  const xMidEl = document.getElementById("cmpXMid");
+  const xEndEl = document.getElementById("cmpXEnd");
+  if (xStartEl) xStartEl.textContent = labels.start;
+  if (xMidEl) xMidEl.textContent = labels.mid;
+  if (xEndEl) xEndEl.textContent = labels.end;
+
+  const colors = [
+    "rgba(255,255,255,0.92)",
+    "rgba(90,255,160,0.95)",
+    "rgba(255,90,120,0.95)",
+    "rgba(120,180,255,0.95)",
+    "rgba(255,210,90,0.95)",
+    "rgba(190,140,255,0.95)"
+  ];
+
+  const left = 70;
+  const right = 580;
+  const top = 40;
+  const bottom = 220;
+  const width = right - left;
+  const height = bottom - top;
+
+  const endLabels = [];
+
+  items.forEach((s, idx) => {
+    const series = buildCompareSeries(s);
+    const pts = series.map((v, i) => {
+      const x = left + (i / Math.max(1, series.length - 1)) * width;
+      const y = bottom - (v / 100) * height;
+      return { x, y, v };
+    });
+
+    const poly = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+    poly.setAttribute("points", pts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" "));
+    poly.setAttribute("class", "cmp-trend-line");
+    poly.setAttribute("stroke", colors[idx % colors.length]);
+    linesGroup.appendChild(poly);
+
+    pts.forEach((p, pointIdx) => {
+      const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      dot.setAttribute("cx", p.x.toFixed(1));
+      dot.setAttribute("cy", p.y.toFixed(1));
+      dot.setAttribute("r", pointIdx === pts.length - 1 ? "4.5" : "3");
+      dot.setAttribute("fill", colors[idx % colors.length]);
+      dotsGroup.appendChild(dot);
+    });
+
+    const last = pts[pts.length - 1];
+    endLabels.push({
+      ticker: s.ticker,
+      y: last.y,
+      color: colors[idx % colors.length]
+    });
+  });
+
+  endLabels.sort((a, b) => a.y - b.y);
+
+  const minGap = 18;
+  for (let i = 1; i < endLabels.length; i++) {
+    if (endLabels[i].y - endLabels[i - 1].y < minGap) {
+      endLabels[i].y = endLabels[i - 1].y + minGap;
+    }
+  }
+
+  endLabels.forEach(lbl => {
+    const connector = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    connector.setAttribute("x1", "580");
+    connector.setAttribute("y1", lbl.y.toFixed(1));
+    connector.setAttribute("x2", "592");
+    connector.setAttribute("y2", lbl.y.toFixed(1));
+    connector.setAttribute("stroke", lbl.color);
+    connector.setAttribute("stroke-width", "1.5");
+    labelsGroup.appendChild(connector);
+
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("x", "596");
+    text.setAttribute("y", (lbl.y + 4).toFixed(1));
+    text.setAttribute("class", "cmp-trend-label");
+    text.setAttribute("fill", lbl.color);
+    text.textContent = lbl.ticker;
+    labelsGroup.appendChild(text);
+  });
+}
+
 function renderCompare() {
   const box = document.getElementById("compareTable");
   if (!box) return;
 
-  compareList = ensureUnique(compareList).filter((t) => STOCKS[t]);
+  compareList = ensureUnique(compareList).filter(ticker => STOCKS[ticker]);
 
-  if (compareList.length === 0) {
+  if (!compareList.length) {
     box.innerHTML = `<div class="muted">${currentLang === "zh" ? "未选择股票。" : "No stocks selected."}</div>`;
     renderCompareRanking();
     renderCompareTrend();
     return;
   }
 
-  const cards = compareList.map((t) => {
-    const s = STOCKS[t];
+  box.innerHTML = compareList.map((ticker) => {
+    const s = STOCKS[ticker];
     const d7Class = s.d7 > 0 ? "pos" : s.d7 < 0 ? "neg" : "neu";
 
     return `
       <div class="compare-item">
         <strong>${escapeHtml(s.ticker)}</strong>
         <div class="muted">${escapeHtml(s.name)}</div>
-
         <div class="badge ${levelToBadgeClass(s.level)}">${levelToText(s.level)}</div>
-
         <div><span class="muted">${currentLang === "zh" ? "评分" : "Score"}:</span> <b>${safeText(s.score, 0)}</b></div>
         <div><span class="muted">${currentLang === "zh" ? "置信度" : "Confidence"}:</span> <b>${safeText(s.conf, 0)}%</b></div>
         <div><span class="muted">7D:</span> <b class="num ${d7Class}">${fmt7d(s.d7)}</b></div>
-
-        <button class="btn primary cmpDetails" data-ticker="${escapeHtml(s.ticker)}">
-          ${currentLang === "zh" ? "查看详情" : "View Details"}
-        </button>
+        <button class="btn primary cmpDetails" data-ticker="${escapeHtml(s.ticker)}">${currentLang === "zh" ? "查看详情" : "View Details"}</button>
       </div>
     `;
   }).join("");
-
-  box.innerHTML = cards;
 
   box.querySelectorAll(".cmpDetails").forEach((btn) => {
     btn.addEventListener("click", async () => {
@@ -1263,34 +2141,38 @@ function renderCompare() {
   renderCompareTrend();
 }
 
-// ----- Reports -----
 function initReportsDropdown() {
   const sel = document.getElementById("repTicker");
   if (!sel) return;
 
   sel.innerHTML = Object.keys(STOCKS)
     .sort()
-    .map((t) => `<option value="${escapeHtml(t)}">${escapeHtml(t)} — ${escapeHtml(STOCKS[t].name)}</option>`)
+    .map((ticker) => `<option value="${escapeHtml(ticker)}">${escapeHtml(ticker)} — ${escapeHtml(STOCKS[ticker].name)}</option>`)
     .join("");
 
   sel.value = selectedTicker || "AAPL";
+
+  const repRange = document.getElementById("repRange");
+  if (repRange) repRange.value = currentRange;
 }
 
 async function buildReportPreview(ticker, rangeOverride = currentRange) {
   const pred = await predictRiskOnline(ticker, rangeOverride);
   const ck = (id) => document.getElementById(id)?.checked;
+  const chartSvg = buildMiniChartSvg(pred.series);
 
   const parts = [];
 
   if (ck("repCkSummary")) {
     parts.push(`
       <div class="pblock">
-        <b>1) Executive summary</b>
+        <b>1) ${escapeHtml(t("rep_exec"))}</b>
         <ul>
-          <li>Risk Level: ${levelToText(pred.level)}</li>
-          <li>Risk Score: ${pred.score} / 100</li>
-          <li>Confidence: ${pred.conf}%</li>
-          <li>7D change: ${fmt7d(pred.d7)}</li>
+          <li>${currentLang === "zh" ? "风险等级" : "Risk Level"}: ${escapeHtml(levelToText(pred.level))}</li>
+          <li>${currentLang === "zh" ? "风险评分" : "Risk Score"}: ${pred.score} / 100</li>
+          <li>${currentLang === "zh" ? "置信度" : "Confidence"}: ${pred.conf}%</li>
+          <li>7D: ${fmt7d(pred.d7)}</li>
+          <li>${escapeHtml(t("rep_rec"))}: ${escapeHtml(pred.advice)}</li>
         </ul>
       </div>
     `);
@@ -1299,8 +2181,10 @@ async function buildReportPreview(ticker, rangeOverride = currentRange) {
   if (ck("repCkDrivers")) {
     parts.push(`
       <div class="pblock">
-        <b>2) Drivers (Top 6)</b>
-        <div class="muted">${pred.drivers.join("<br/>")}</div>
+        <b>2) ${escapeHtml(t("rep_drivers"))}</b>
+        <div class="report-driver-list">
+          ${(pred.drivers || []).map(d => `<div class="report-driver-item">${escapeHtml(d)}</div>`).join("")}
+        </div>
       </div>
     `);
   }
@@ -1308,13 +2192,14 @@ async function buildReportPreview(ticker, rangeOverride = currentRange) {
   if (ck("repCkMetrics")) {
     parts.push(`
       <div class="pblock">
-        <b>3) Metrics & Rules</b>
-        <div class="muted">
-          Rules: High &gt; ${pred.rules.high}%, Medium ${pred.rules.medLo}%–${pred.rules.medHi}%, Low &lt; ${pred.rules.low}%
-          <br/>20D vol: ${Math.round(pred.metrics?.vol20 || 0)}%
-          <br/>60D vol: ${Math.round(pred.metrics?.vol60 || 0)}%
-          <br/>6M MDD: ${(pred.metrics?.mdd6m || 0).toFixed(1)}%
-          <br/>Beta: ${(pred.metrics?.beta || 0).toFixed(2)}
+        <b>3) ${escapeHtml(t("rep_metrics"))}</b>
+        <div class="report-metrics">
+          <div>${currentLang === "zh" ? "规则" : "Rules"}：${levelToText("HIGH")} > ${pred.rules.high}%，${levelToText("MEDIUM")} ${pred.rules.medLo}%–${pred.rules.medHi}%，${levelToText("LOW")} < ${pred.rules.low}%</div>
+          <div>20D vol: ${Math.round(pred.metrics?.vol20 || 0)}%</div>
+          <div>60D vol: ${Math.round(pred.metrics?.vol60 || 0)}%</div>
+          <div>6M MDD: ${(pred.metrics?.mdd6m || 0).toFixed(1)}%</div>
+          <div>Beta: ${(pred.metrics?.beta || 0).toFixed(2)}</div>
+          <div>${escapeHtml(t("metric_volchg"))}: ${Number(pred.metrics?.volChgPct || 0) >= 0 ? "↑" : "↓"} ${Math.abs(Number(pred.metrics?.volChgPct || 0)).toFixed(0)}%</div>
         </div>
       </div>
     `);
@@ -1323,8 +2208,11 @@ async function buildReportPreview(ticker, rangeOverride = currentRange) {
   if (ck("repCkCharts")) {
     parts.push(`
       <div class="pblock">
-        <b>4) Charts</b>
-        <div class="muted">Risk Score Trend (shown in S1/S2 and Compare)</div>
+        <b>4) ${escapeHtml(t("rep_charts"))}</b>
+        <div class="report-chart-wrap">
+          <div class="report-chart-title">${escapeHtml(t("rep_chart_caption"))}</div>
+          ${chartSvg}
+        </div>
       </div>
     `);
   }
@@ -1332,7 +2220,7 @@ async function buildReportPreview(ticker, rangeOverride = currentRange) {
   if (ck("repCkDisclaimer")) {
     parts.push(`
       <div class="pblock">
-        <b>5) Disclaimer</b>
+        <b>5) ${escapeHtml(t("rep_disclaimer"))}</b>
         <div class="muted">
           ${currentLang === "zh" ? "仅用于学习展示，不构成投资建议。" : "For educational use only. Not financial advice."}
         </div>
@@ -1344,7 +2232,7 @@ async function buildReportPreview(ticker, rangeOverride = currentRange) {
     <div class="report-two-col">
       <div class="report-main">
         <div class="pblock">
-          <b>${currentLang === "zh" ? "报告对象：" : "Report for:"}</b>
+          <b>${escapeHtml(t("rep_report_for"))}</b>
           ${escapeHtml(pred.ticker)} — ${escapeHtml(STOCKS[pred.ticker]?.name || pred.name)}
         </div>
         ${parts.join("")}
@@ -1352,67 +2240,70 @@ async function buildReportPreview(ticker, rangeOverride = currentRange) {
 
       <aside class="report-side">
         <div class="report-side-card">
-          <div class="report-side-title">${currentLang === "zh" ? "Report Notes" : "Report Notes"}</div>
+          <div class="report-side-title">${escapeHtml(t("rep_notes"))}</div>
           <div class="report-side-text">
             ${currentLang === "zh"
-              ? `
-                当前预览采用左右分布。
-                <br>左侧显示报告正文内容，
-                <br>右侧显示说明、摘要与状态信息。
-              `
-              : `
-                This preview uses a left-right layout.
-                <br>The left side shows the main report content.
-                <br>The right side shows notes, summary and status info.
-              `}
+              ? "左侧显示正文内容，右侧显示摘要与状态信息。这样可以让报告页面更完整，也更接近正式系统界面。"
+              : "The left side shows the main report content, while the right side shows summary and status information. This makes the report page look more complete and system-like."}
           </div>
         </div>
 
         <div class="report-side-card">
-          <div class="report-side-title">${currentLang === "zh" ? "Quick Summary" : "Quick Summary"}</div>
+          <div class="report-side-title">${escapeHtml(t("rep_quick"))}</div>
           <div class="report-side-text">
             <div><span class="muted">Ticker:</span> <b>${escapeHtml(pred.ticker)}</b></div>
-            <div><span class="muted">Level:</span> <b>${levelToText(pred.level)}</b></div>
-            <div><span class="muted">Score:</span> <b>${pred.score}</b></div>
-            <div><span class="muted">Confidence:</span> <b>${pred.conf}%</b></div>
-            <div><span class="muted">Range:</span> <b>${rangeOverride}</b></div>
+            <div><span class="muted">${currentLang === "zh" ? "等级" : "Level"}:</span> <b>${escapeHtml(levelToText(pred.level))}</b></div>
+            <div><span class="muted">${currentLang === "zh" ? "评分" : "Score"}:</span> <b>${pred.score}</b></div>
+            <div><span class="muted">${currentLang === "zh" ? "置信度" : "Confidence"}:</span> <b>${pred.conf}%</b></div>
+            <div><span class="muted">${currentLang === "zh" ? "范围" : "Range"}:</span> <b>${escapeHtml(rangeOverride)}</b></div>
             <div><span class="muted">7D:</span> <b class="${pred.d7 > 0 ? "num pos" : pred.d7 < 0 ? "num neg" : "num neu"}">${fmt7d(pred.d7)}</b></div>
+            <div class="report-advice"><span class="muted">${escapeHtml(t("rep_rec"))}:</span> ${escapeHtml(pred.advice)}</div>
           </div>
         </div>
 
         <div class="report-side-card">
-          <div class="report-side-title">${currentLang === "zh" ? "Layout Purpose" : "Layout Purpose"}</div>
-          <div class="report-side-text">
-            ${currentLang === "zh"
-              ? "这样可以让右侧不再留白，同时让报告界面更完整、更像正式系统。"
-              : "This fills the empty right side and makes the report look more complete and dashboard-like."}
-          </div>
+          <div class="report-side-title">${escapeHtml(t("rep_layout"))}</div>
+          <div class="report-side-text">${escapeHtml(t("rep_layout_text"))}</div>
         </div>
       </aside>
     </div>
   `;
 }
 
-// ----- Language -----
 async function applyLanguage(lang) {
   currentLang = lang;
-  const dict = I18N[lang];
+  document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+  document.title = t("app_title");
 
   document.querySelectorAll("[data-i18n]").forEach(el => {
     const key = el.getAttribute("data-i18n");
-    if (dict[key]) el.textContent = dict[key];
+    const value = t(key);
+    if (value) el.textContent = value;
   });
 
   document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
     const key = el.getAttribute("data-i18n-placeholder");
-    if (dict[key]) el.setAttribute("placeholder", dict[key]);
+    const value = t(key);
+    if (value) el.setAttribute("placeholder", value);
   });
 
   const pred = await predictRiskOnline(selectedTicker, currentRange);
   applyPrediction(pred);
+  await requestAndRenderForecast(selectedTicker, currentRange, currentForecastDays);
+
+  const reportPreview = document.getElementById("reportPreview");
+  if (reportPreview?.dataset.generated === "1") {
+    const ticker = document.getElementById("repTicker")?.value || selectedTicker;
+    const repRange = document.getElementById("repRange")?.value || currentRange;
+    reportPreview.innerHTML = await buildReportPreview(ticker, repRange);
+  }
+
+  if (lastForecastResult) renderForecastCard(lastForecastResult);
+
+  renderWatchlist();
+  renderCompare();
 }
 
-// ----- Range -----
 async function setRange(range) {
   currentRange = range;
 
@@ -1423,17 +2314,25 @@ async function setRange(range) {
   const cmpRange = document.getElementById("cmpRange");
   if (cmpRange) cmpRange.value = range;
 
+  const repRange = document.getElementById("repRange");
+  if (repRange) repRange.value = range;
+
   const pred = await predictRiskOnline(selectedTicker, currentRange);
   applyPrediction(pred);
+  await requestAndRenderForecast(selectedTicker, currentRange, currentForecastDays);
+
+  const reportPreview = document.getElementById("reportPreview");
+  if (reportPreview?.dataset.generated === "1") {
+    const ticker = document.getElementById("repTicker")?.value || selectedTicker;
+    reportPreview.innerHTML = await buildReportPreview(ticker, currentRange);
+  }
 }
 
-// ----- Auto refresh -----
 async function refreshCompareData() {
   if (!compareList.length) return;
 
   for (const ticker of compareList) {
     const pred = await predictRiskOnline(ticker, currentRange);
-
     if (!STOCKS[ticker]) {
       STOCKS[ticker] = {
         ticker: pred.ticker,
@@ -1455,6 +2354,15 @@ async function refreshCompareData() {
   renderCompare();
 }
 
+
+async function previewTickerFromInput(rawTicker) {
+  const ticker = String(rawTicker || '').trim().toUpperCase();
+  if (!ticker) return;
+  const pred = await predictRiskOnline(ticker, currentRange);
+  applyPrediction(pred);
+  await requestAndRenderForecast(ticker, currentRange, currentForecastDays);
+}
+
 async function refreshDashboardData() {
   if (!selectedTicker) return;
   const pred = await predictRiskOnline(selectedTicker, currentRange);
@@ -1463,16 +2371,12 @@ async function refreshDashboardData() {
 
 function startAutoRefresh() {
   stopAutoRefresh();
-
   autoRefreshTimer = setInterval(async () => {
     try {
       await refreshDashboardData();
       await refreshCompareData();
-
       const setSync = document.getElementById("setSync");
       if (setSync) setSync.textContent = new Date().toLocaleString();
-
-      console.log("Auto refresh completed:", new Date().toLocaleString());
     } catch (e) {
       console.error("Auto refresh failed:", e);
     }
@@ -1486,66 +2390,131 @@ function stopAutoRefresh() {
   }
 }
 
-// ----- Events -----
 window.addEventListener("DOMContentLoaded", async () => {
   document.querySelectorAll(".tab").forEach(tab => {
     tab.addEventListener("click", () => switchView(tab.dataset.view));
   });
 
-  document.getElementById("s1PredictBtn").addEventListener("click", async () => {
-    const btn = document.getElementById("s1PredictBtn");
-    const input = document.getElementById("s1Search");
-    const t = (input.value || "").trim().toUpperCase() || selectedTicker || "AAPL";
+  const s1PredictBtn = document.getElementById("s1PredictBtn");
+  if (s1PredictBtn) {
+    s1PredictBtn.addEventListener("click", async () => {
+      const btn = document.getElementById("s1PredictBtn");
+      const input = document.getElementById("s1Search");
+      const ticker = (input.value || "").trim().toUpperCase() || selectedTicker || "AAPL";
 
-    const s1Selected = document.getElementById("s1Selected");
-    const s1Explain = document.getElementById("s1Explain");
-    const kpiUpdate = document.getElementById("kpiUpdate");
+      const s1Selected = document.getElementById("s1Selected");
+      const s1Explain = document.getElementById("s1Explain");
+      const kpiUpdate = document.getElementById("kpiUpdate");
 
-    if (s1Selected) s1Selected.textContent = `${t} — Loading...`;
-    if (s1Explain) s1Explain.textContent = currentLang === "zh" ? `正在获取 ${t} 的数据...` : `Loading data for ${t}...`;
-    if (kpiUpdate) kpiUpdate.textContent = new Date().toLocaleString();
+      if (s1Selected) s1Selected.textContent = `${ticker} — Loading...`;
+      if (s1Explain) s1Explain.textContent = currentLang === "zh" ? `正在获取 ${ticker} 的数据...` : `Loading data for ${ticker}...`;
+      if (kpiUpdate) kpiUpdate.textContent = new Date().toLocaleString();
 
-    try {
-      btn.disabled = true;
-      btn.textContent = currentLang === "zh" ? "加载中..." : "Loading...";
-
-      const pred = await predictRiskOnline(t, currentRange);
-      applyPrediction(pred);
-      input.value = t;
-    } catch (e) {
-      console.error("Predict failed:", e);
-      if (s1Explain) {
-        s1Explain.textContent = currentLang === "zh"
-          ? "预测失败，请检查股票代码。"
-          : "Prediction failed. Please check the ticker.";
+      try {
+        btn.disabled = true;
+        btn.textContent = currentLang === "zh" ? "加载中..." : "Loading...";
+        const pred = await predictRiskOnline(ticker, currentRange);
+        applyPrediction(pred);
+        await requestAndRenderForecast(ticker, currentRange, currentForecastDays);
+        input.value = ticker;
+      } catch (e) {
+        console.error("Predict failed:", e);
+        if (s1Explain) {
+          s1Explain.textContent = currentLang === "zh"
+            ? "预测失败，请检查股票代码。"
+            : "Prediction failed. Please check the ticker.";
+        }
+      } finally {
+        btn.disabled = false;
+        btn.textContent = t("btn_predict");
       }
-      alert(currentLang === "zh" ? "预测失败，请检查股票代码。" : "Prediction failed. Please check the ticker.");
-    } finally {
+    });
+  }
+
+  const s1Search = document.getElementById("s1Search");
+  if (s1Search) {
+    s1Search.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") s1PredictBtn?.click();
+    });
+    s1Search.addEventListener("change", async (e) => {
+      const ticker = String(e.target.value || '').trim().toUpperCase();
+      if (ticker) await previewTickerFromInput(ticker);
+    });
+    s1Search.addEventListener("input", (e) => {
+      const ticker = String(e.target.value || '').trim().toUpperCase();
+      if (searchPreviewTimer) clearTimeout(searchPreviewTimer);
+      if (!ticker || ticker === selectedTicker) return;
+      searchPreviewTimer = setTimeout(async () => {
+        try {
+          await previewTickerFromInput(ticker);
+        } catch (err) {
+          console.warn('Preview ticker failed:', err?.message || err);
+        }
+      }, 500);
+    });
+  }
+
+
+const forecastDaysInput = document.getElementById("forecastDays");
+if (forecastDaysInput) {
+  forecastDaysInput.value = String(currentForecastDays);
+  forecastDaysInput.addEventListener("change", async (e) => {
+    currentForecastDays = clamp(Number(e.target.value || 7), 1, 60);
+    e.target.value = String(currentForecastDays);
+    const tickerLabel = document.getElementById("forecastTickerLabel");
+    if (tickerLabel) tickerLabel.textContent = currentLang === "zh" ? `${selectedTicker} • ${currentForecastDays}天` : `${selectedTicker} • ${currentForecastDays}D`;
+    if (lastForecastResult) {
+      await requestAndRenderForecast(selectedTicker, currentRange, currentForecastDays);
+    }
+  });
+}
+
+if (forecastDaysInput) {
+  forecastDaysInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") document.getElementById("forecastBtn")?.click();
+  });
+}
+
+document.getElementById("forecastBtn")?.addEventListener("click", async () => {
+  const btn = document.getElementById("forecastBtn");
+  const inputDays = document.getElementById("forecastDays");
+  currentForecastDays = clamp(Number(inputDays?.value || 7), 1, 60);
+  if (inputDays) inputDays.value = String(currentForecastDays);
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = currentLang === "zh" ? "生成中..." : "Loading...";
+  }
+  try {
+    await requestAndRenderForecast(selectedTicker, currentRange, currentForecastDays);
+  } finally {
+    if (btn) {
       btn.disabled = false;
-      btn.textContent = currentLang === "zh" ? "AI预测" : "Predict Risk";
+      btn.textContent = t("fc_generate");
     }
-  });
+  }
+});
 
-  document.getElementById("s1Search").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      document.getElementById("s1PredictBtn").click();
-    }
-  });
+document.getElementById("forecastExportBtn")?.addEventListener("click", () => {
+  downloadForecastCsv();
+});
 
-  document.getElementById("btnViewDetails").addEventListener("click", async () => {
+  document.getElementById("btnViewDetails")?.addEventListener("click", async () => {
+    const searchTicker = (document.getElementById("s1Search")?.value || selectedTicker || "").trim().toUpperCase();
+    if (searchTicker) selectedTicker = searchTicker;
     const pred = await predictRiskOnline(selectedTicker, currentRange);
     applyPrediction(pred);
+    await requestAndRenderForecast(selectedTicker, currentRange, currentForecastDays);
     switchView("detail");
   });
 
-  document.getElementById("btnGoReports").addEventListener("click", () => {
+  document.getElementById("btnGoReports")?.addEventListener("click", () => {
     switchView("reports");
     initReportsDropdown();
   });
 
-  document.getElementById("btnBackToS1").addEventListener("click", () => switchView("dashboard"));
+  document.getElementById("btnBackToS1")?.addEventListener("click", () => switchView("dashboard"));
 
-  document.getElementById("btnAddToWatchlist").addEventListener("click", () => {
+  document.getElementById("btnAddToWatchlist")?.addEventListener("click", () => {
     if (!watchlist.includes(selectedTicker)) watchlist.unshift(selectedTicker);
     watchlist = ensureUnique(watchlist);
     switchView("watchlist");
@@ -1566,62 +2535,66 @@ window.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  document.getElementById("wlSearch").addEventListener("input", renderWatchlist);
-  document.getElementById("wlRiskSelect").addEventListener("change", renderWatchlist);
-  document.getElementById("wlFilterBtn").addEventListener("click", () => {
+  document.getElementById("wlSearch")?.addEventListener("input", renderWatchlist);
+  document.getElementById("wlRiskSelect")?.addEventListener("change", renderWatchlist);
+  document.getElementById("wlFilterBtn")?.addEventListener("click", () => {
     const sel = document.getElementById("wlRiskSelect");
+    if (!sel) return;
     const order = ["ALL", "HIGH", "MEDIUM", "LOW"];
     sel.value = order[(order.indexOf(sel.value) + 1) % order.length];
     renderWatchlist();
   });
 
-  document.getElementById("cmpAddBtn").addEventListener("click", async () => {
-    const v = (document.getElementById("cmpInput").value || "").trim().toUpperCase();
+  document.getElementById("cmpAddBtn")?.addEventListener("click", async () => {
+    const v = (document.getElementById("cmpInput")?.value || "").trim().toUpperCase();
     if (!v) return;
 
     const pred = await predictRiskOnline(v, currentRange);
     applyPrediction(pred);
-
     compareList.push(v);
     compareList = ensureUnique(compareList);
-    document.getElementById("cmpInput").value = "";
+
+    const cmpInput = document.getElementById("cmpInput");
+    if (cmpInput) cmpInput.value = "";
     renderCompare();
   });
 
-  document.getElementById("cmpInput").addEventListener("keydown", async (e) => {
-    if (e.key === "Enter") {
-      document.getElementById("cmpAddBtn").click();
-    }
+  document.getElementById("cmpInput")?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") document.getElementById("cmpAddBtn")?.click();
   });
 
-  document.getElementById("cmpGenBtn").addEventListener("click", async () => {
+  document.getElementById("cmpGenBtn")?.addEventListener("click", async () => {
     await refreshCompareData();
   });
 
-  document.getElementById("repGenBtn").addEventListener("click", async () => {
-    const ticker = document.getElementById("repTicker").value || selectedTicker;
+  document.getElementById("repGenBtn")?.addEventListener("click", async () => {
+    const ticker = document.getElementById("repTicker")?.value || selectedTicker;
     const repRange = document.getElementById("repRange")?.value || currentRange;
-    document.getElementById("reportPreview").innerHTML = await buildReportPreview(ticker, repRange);
+    const reportPreview = document.getElementById("reportPreview");
+    if (!reportPreview) return;
+    reportPreview.innerHTML = await buildReportPreview(ticker, repRange);
+    reportPreview.dataset.generated = "1";
   });
 
-  document.getElementById("repExportBtn").addEventListener("click", () => {
-    alert("Prototype: Export PDF is a placeholder in this UI demo.");
+  document.getElementById("repExportBtn")?.addEventListener("click", () => {
+    alert(currentLang === "zh" ? "原型演示：导出 PDF 仍是占位功能。" : "Prototype: Export PDF is still a placeholder.");
   });
 
-  document.getElementById("setSaveBtn").addEventListener("click", () => {
+  document.getElementById("setSaveBtn")?.addEventListener("click", () => {
     const theme = document.getElementById("setTheme")?.value || "dark";
     applyTheme(theme);
     alert(currentLang === "zh" ? "设置已保存" : "Settings saved.");
   });
 
-  document.getElementById("setRefreshBtn").addEventListener("click", async () => {
-    document.getElementById("setSync").textContent = new Date().toLocaleString();
+  document.getElementById("setRefreshBtn")?.addEventListener("click", async () => {
+    const sync = document.getElementById("setSync");
+    if (sync) sync.textContent = new Date().toLocaleString();
     await refreshDashboardData();
     await refreshCompareData();
     alert(currentLang === "zh" ? "已刷新（原型）" : "Data refreshed (prototype).");
   });
 
-  document.getElementById("setLang").addEventListener("change", async (e) => {
+  document.getElementById("setLang")?.addEventListener("change", async (e) => {
     await applyLanguage(e.target.value);
   });
 
@@ -1630,7 +2603,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     const savedTheme = localStorage.getItem("theme") || "dark";
     themeSelect.value = savedTheme;
     applyTheme(savedTheme);
-
     themeSelect.addEventListener("change", (e) => {
       applyTheme(e.target.value);
     });
@@ -1641,6 +2613,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   const pred = await predictRiskOnline(selectedTicker, currentRange);
   applyPrediction(pred);
+  await requestAndRenderForecast(selectedTicker, currentRange, currentForecastDays);
   renderWatchlist();
   renderCompare();
   startAutoRefresh();

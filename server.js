@@ -76,6 +76,146 @@ function rangeToYahoo(range) {
   return { range: "3y", interval: "1d" };
 }
 
+
+function clamp(n, min, max) {
+  const v = Number(n);
+  if (!Number.isFinite(v)) return min;
+  return Math.min(max, Math.max(min, v));
+}
+
+function mean(arr) {
+  const nums = (arr || []).filter((v) => Number.isFinite(v));
+  if (!nums.length) return 0;
+  return nums.reduce((a, b) => a + b, 0) / nums.length;
+}
+
+function sampleStd(arr) {
+  const nums = (arr || []).filter((v) => Number.isFinite(v));
+  if (nums.length < 2) return 0;
+  const m = mean(nums);
+  const variance = nums.reduce((acc, v) => acc + (v - m) * (v - m), 0) / (nums.length - 1);
+  return Math.sqrt(Math.max(variance, 0));
+}
+
+function pctChange(base, latest) {
+  const b = Number(base);
+  const l = Number(latest);
+  if (!Number.isFinite(b) || !Number.isFinite(l) || b === 0) return 0;
+  return ((l - b) / b) * 100;
+}
+
+function movingAverage(values, n) {
+  const nums = (values || []).filter((v) => Number.isFinite(v));
+  const out = [];
+  for (let i = 0; i < nums.length; i++) {
+    if (i + 1 < n) continue;
+    const window = nums.slice(i - n + 1, i + 1);
+    out.push(mean(window));
+  }
+  return out;
+}
+
+function slopeLast(values, k = 5) {
+  const nums = (values || []).filter((v) => Number.isFinite(v)).slice(-k);
+  if (nums.length < 2) return 0;
+  const x = nums.map((_, i) => i);
+  const xm = mean(x);
+  const ym = mean(nums);
+  let num = 0;
+  let den = 0;
+  for (let i = 0; i < nums.length; i++) {
+    num += (x[i] - xm) * (nums[i] - ym);
+    den += (x[i] - xm) * (x[i] - xm);
+  }
+  return den ? num / den : 0;
+}
+
+function buildHistorySummary(series) {
+  const points = Array.isArray(series) ? series : [];
+  const closes = points.map((p) => Number(p.close)).filter((v) => Number.isFinite(v));
+  if (!closes.length) {
+    throw new Error("History series is empty");
+  }
+
+  return {
+    startPrice: Number(closes[0].toFixed(2)),
+    endPrice: Number(closes[closes.length - 1].toFixed(2)),
+    averagePrice: Number(mean(closes).toFixed(2)),
+    highestPrice: Number(Math.max(...closes).toFixed(2)),
+    lowestPrice: Number(Math.min(...closes).toFixed(2)),
+    priceChangePct: Number(pctChange(closes[0], closes[closes.length - 1]).toFixed(2)),
+    totalDataDays: closes.length,
+  };
+}
+
+function buildRecentSample(series, limit = 10) {
+  return (series || []).slice(-limit).map((p) => ({
+    date: String(p.t || "").slice(0, 10),
+    close: Number(Number(p.close || 0).toFixed(2)),
+  }));
+}
+
+function buildForecastFromHistory(closes, forecastDays, summary) {
+  const prices = (closes || []).filter((v) => Number.isFinite(v));
+  if (prices.length < 10) {
+    return {
+      method: "rule-based web adaptation",
+      analysis: "Insufficient historical data, so the trend is not stable enough for a stronger view.",
+      forecast: `Expected to move sideways over the next ${forecastDays} days because the sample size is limited.`,
+      confidence: "Low",
+      keyFactors: [
+        "Limited data sample",
+        "Short price history",
+        "Volatility uncertainty",
+      ],
+    };
+  }
+
+  const returns = [];
+  for (let i = 1; i < prices.length; i++) {
+    if (prices[i - 1] !== 0) returns.push(prices[i] / prices[i - 1] - 1);
+  }
+
+  const vol = sampleStd(returns);
+  const shortMa = movingAverage(prices, 5);
+  const longMa = movingAverage(prices, 20);
+  const sSlope = slopeLast(shortMa, 6);
+  const lSlope = slopeLast(longMa, 6);
+
+  let score = 0;
+  score += sSlope > 0 ? 1 : sSlope < 0 ? -1 : 0;
+  score += lSlope > 0 ? 0.7 : lSlope < 0 ? -0.7 : 0;
+
+  const pct = Number(summary.priceChangePct || 0);
+  score += pct > 0 ? 0.3 : pct < 0 ? -0.3 : 0;
+
+  const highVol = vol >= 0.02;
+  const direction = score >= 1 ? "Bullish" : score <= -1 ? "Bearish" : "Sideways";
+
+  let confidence = "Medium";
+  if (direction === "Sideways" && highVol) confidence = "Medium";
+  else if (Math.abs(score) >= 1.7 && !highVol) confidence = "Medium";
+  else if (Math.abs(score) >= 1.7 && highVol) confidence = "Medium";
+  else confidence = highVol ? "Low" : "Medium";
+
+  const analysis = `Short-term MA slope is ${sSlope > 0 ? "upward" : sSlope < 0 ? "downward" : "flat"}, medium-term MA slope is ${lSlope > 0 ? "upward" : lSlope < 0 ? "downward" : "flat"}; daily volatility is about ${(vol * 100).toFixed(2)}%.`;
+  const forecast = `Expected to be ${direction} over the next ${forecastDays} days because MA slope and range price change signals are ${score >= 0 ? "mostly supportive" : "mostly weak"}, ${highVol ? "but volatility remains high" : "and volatility is relatively controlled"}.`;
+
+  return {
+    method: "rule-based web adaptation",
+    analysis,
+    forecast,
+    confidence,
+    keyFactors: [
+      "MA trends (5/20 day)",
+      "Range price change",
+      "Return volatility",
+      "Market sentiment",
+      "Macroeconomic events",
+    ].slice(0, 5),
+  };
+}
+
 // Node 18+ has fetch
 if (typeof fetch !== "function") {
   console.error("ERROR: Node.js 18+ is required (global fetch not found).");
@@ -233,6 +373,42 @@ app.get("/api/history", async (req, res) => {
   }
 });
 
+
+
+app.get("/api/forecast", async (req, res) => {
+  const ticker = cleanTicker(req.query.t);
+  const range = String(req.query.range || "1M").toUpperCase();
+  const forecastDays = clamp(Number(req.query.days || 7), 1, 60);
+
+  if (!ticker) {
+    return errJson(res, 400, "Missing ticker. Use /api/forecast?t=AAPL&range=1M&days=7");
+  }
+
+  try {
+    const hist = await getHistoryUnified(ticker, range);
+    const closes = (hist.series || []).map((p) => Number(p.close)).filter((v) => Number.isFinite(v));
+    const summary = buildHistorySummary(hist.series || []);
+    const forecast = buildForecastFromHistory(closes, forecastDays, summary);
+
+    okJson(res, {
+      ticker,
+      range,
+      forecastDays,
+      generatedAt: nowISO(),
+      status: "ok",
+      source: "Integrated from second project",
+      dateRange: `${String(hist.series?.[0]?.t || "").slice(0, 10)} to ${String(hist.series?.[hist.series.length - 1]?.t || "").slice(0, 10)}`,
+      historicalSummary: summary,
+      recentSample: buildRecentSample(hist.series || [], 10),
+      ...forecast,
+    });
+  } catch (e) {
+    errJson(res, 502, "Failed to generate forecast", {
+      detail: String(e?.message || e),
+    });
+  }
+});
+
 // SPA fallback
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
@@ -243,6 +419,7 @@ app.listen(PORT, HOST, () => {
   console.log(`Local:  http://localhost:${PORT}`);
   console.log(`Health: http://localhost:${PORT}/api/health`);
   console.log(`Hist:   http://localhost:${PORT}/api/history?t=AAPL&range=1M`);
+  console.log(`Forecast: http://localhost:${PORT}/api/forecast?t=AAPL&range=1M&days=7`);
 
   if (!FINNHUB_API_KEY) {
     console.log("NOTE: FINNHUB_API_KEY not set. Using Yahoo fallback (best-effort).");

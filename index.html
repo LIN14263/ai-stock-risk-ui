@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AI Stock Risk UI</title>
+  <title>AI Stock Risk</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 
-<body>
+<body class="dark-theme">
   <header class="topbar">
     <div class="brand">
       <div class="logo">AI</div>
@@ -27,7 +27,7 @@
   </header>
 
   <main class="container">
-    <!-- DASHBOARD (S1) -->
+    <!-- DASHBOARD -->
     <section id="view-dashboard" class="view active">
       <div class="section-header">
         <h1 data-i18n="s1_title">S1 — Stock Risk Dashboard</h1>
@@ -49,7 +49,7 @@
         </div>
 
         <div class="card kpi">
-          <div class="kpi-label" data-i18n="kpi_score">Risk Score (0-100)</div>
+          <div class="kpi-label" data-i18n="kpi_score">Risk Score (0–100)</div>
           <div id="kpiScore" class="kpi-value">78</div>
         </div>
 
@@ -65,7 +65,7 @@
       </div>
 
       <div class="grid s1-main">
-        <div class="card">
+        <div class="card s1-summary-card">
           <h2 class="card-title" data-i18n="s1_summary">Risk Summary</h2>
 
           <div class="row">
@@ -89,37 +89,101 @@
             <button class="btn" id="btnGoReports" data-i18n="btn_generate_report">Generate Report</button>
           </div>
         </div>
-
-        <div class="card">
-          <div class="row">
-            <h2 class="card-title" data-i18n="s1_chart_title">Risk Score Trend</h2>
-            <div class="muted small" id="s1RangeLabel">Range: 1M</div>
-          </div>
-
-          <div class="chart-area">
-            <svg id="s1Chart" class="linechart" viewBox="0 0 600 220" preserveAspectRatio="none">
-              <polyline id="s1Line" fill="none" stroke-width="3"></polyline>
-              <circle id="s1Dot" r="6"></circle>
-              <text id="s1LastText" x="10" y="22" class="chart-text">Latest: 78</text>
-
-              <text id="s1YLabel" class="axis-label" x="14" y="110" transform="rotate(-90 14 110)">Risk Score (0-100)</text>
-              <text id="s1XLabel" class="axis-label" x="300" y="214" text-anchor="middle">Time</text>
-
-              <text id="s1YTick100" class="axis-tick" x="22" y="38">100</text>
-              <text id="s1YTick50" class="axis-tick" x="22" y="118">50</text>
-              <text id="s1YTick0" class="axis-tick" x="22" y="198">0</text>
-
-              <text id="s1XStart" class="axis-tick" x="20" y="214" text-anchor="start">Start</text>
-              <text id="s1XEnd" class="axis-tick" x="580" y="214" text-anchor="end">End</text>
-            </svg>
-          </div>
-
-          <div class="footnote" data-i18n="chart_note">Line updates with prediction and time range.</div>
-        </div>
       </div>
+
+<div class="grid forecast-grid">
+  <div class="card">
+    <div class="row">
+      <h2 class="card-title" data-i18n="fc_title">AI Forecast</h2>
+      <div id="forecastTickerLabel" class="pill">AAPL • 7D</div>
+    </div>
+
+    <div class="search-row forecast-controls">
+      <span class="muted" data-i18n="fc_days">Forecast Days</span>
+      <input id="forecastDays" class="input forecast-days-input" type="number" min="1" max="60" value="7" />
+      <button class="btn primary" id="forecastBtn" data-i18n="fc_generate">Generate Forecast</button>
+      <button class="btn" id="forecastExportBtn" data-i18n="fc_export">Export CSV</button>
+    </div>
+
+    <div id="forecastStatus" class="footnote" data-i18n="fc_hint">Forecast combines the second file’s trend summary, direction, confidence, and key factors.</div>
+
+    <div class="forecast-result-grid">
+      <div class="forecast-block">
+        <div class="sub-title" data-i18n="fc_analysis">Trend Analysis</div>
+        <div id="forecastAnalysis" class="forecast-text">-</div>
+      </div>
+
+      <div class="forecast-block">
+        <div class="sub-title" data-i18n="fc_outlook">Forecast Outlook</div>
+        <div id="forecastOutlook" class="forecast-text">-</div>
+      </div>
+    </div>
+
+    <div class="forecast-meta-row">
+      <div class="forecast-chip-wrap">
+        <span class="muted" data-i18n="fc_conf">Confidence</span>
+        <span id="forecastConfidence" class="badge low">-</span>
+      </div>
+      <div class="forecast-chip-wrap">
+        <span class="muted" data-i18n="fc_method">Method</span>
+        <span id="forecastMethod" class="pill">-</span>
+      </div>
+    </div>
+
+    <div class="forecast-block forecast-factors-block">
+      <div class="sub-title" data-i18n="fc_factors">Key Factors</div>
+      <div id="forecastFactors" class="drivers"></div>
+    </div>
+  </div>
+
+  <div class="card forecast-summary-card">
+    <h2 class="card-title" data-i18n="fc_hist_title">Historical Summary</h2>
+    <div id="forecastSummary" class="forecast-summary-list"></div>
+  </div>
+</div>
+
+      <div class="card s1-chart-card">
+        <div class="row">
+          <h2 class="card-title" data-i18n="s1_chart_title">Risk Score Trend</h2>
+          <div class="muted small" id="s1RangeLabel">Range: 1M</div>
+        </div>
+
+        <div class="chart-area chart-area-large">
+          <svg id="s1Chart" class="linechart linechart-large" viewBox="0 0 1040 380" preserveAspectRatio="xMidYMid meet" aria-label="Stock trend chart">
+            <line id="s1GridTop" class="chart-grid" x1="110" y1="82" x2="960" y2="82"></line>
+            <line id="s1GridMid" class="chart-grid" x1="110" y1="192" x2="960" y2="192"></line>
+            <line id="s1GridBot" class="chart-grid" x1="110" y1="302" x2="960" y2="302"></line>
+
+            <line id="s1AxisY" class="chart-axis" x1="110" y1="82" x2="110" y2="302"></line>
+            <line id="s1AxisX" class="chart-axis" x1="110" y1="302" x2="960" y2="302"></line>
+
+            <polygon id="s1ForecastArea" class="chart-forecast-area"></polygon>
+            <polyline id="s1HistLine" class="chart-history-line"></polyline>
+            <polyline id="s1ProjLine" class="chart-proj-line"></polyline>
+            <circle id="s1ProjStart" class="chart-proj-start" r="5" vector-effect="non-scaling-stroke"></circle>
+            <circle id="s1Dot" class="chart-last-dot" r="9" vector-effect="non-scaling-stroke"></circle>
+
+            <text id="s1YLabel" class="axis-label axis-label-top" x="110" y="28">AAPL history + forecast</text>
+            <text id="s1LastText" x="110" y="54" class="chart-text chart-latest">Latest: 78</text>
+            <text id="s1XLabel" class="axis-label axis-label-x" x="535" y="366" text-anchor="middle">Time</text>
+
+            <text id="s1YTick100" class="axis-tick" x="92" y="88" text-anchor="end">100</text>
+            <text id="s1YTick50" class="axis-tick" x="92" y="198" text-anchor="end">50</text>
+            <text id="s1YTick0" class="axis-tick" x="92" y="308" text-anchor="end">0</text>
+
+            <text id="s1XStart" class="axis-tick" x="110" y="332" text-anchor="start">Start</text>
+            <text id="s1XMid" class="axis-tick" x="535" y="332" text-anchor="middle">Middle</text>
+            <text id="s1XEnd" class="axis-tick" x="960" y="332" text-anchor="end">End</text>
+          </svg>
+        </div>
+
+        <div class="footnote" data-i18n="chart_note">The line updates with prediction and selected time range.</div>
+      </div>
+
+
     </section>
 
-    <!-- DETAIL (S2) -->
+    <!-- DETAIL -->
     <section id="view-detail" class="view">
       <div class="section-header">
         <h1 data-i18n="s2_title">S2 — Risk Score & Drivers</h1>
@@ -165,12 +229,9 @@
         <div class="card">
           <h2 class="card-title" data-i18n="s2_drivers">Key Drivers</h2>
           <div class="drivers" id="s2DriversList">
-            <div class="driver" id="d1"></div>
-            <div class="driver" id="d2"></div>
-            <div class="driver" id="d3"></div>
-            <div class="driver" id="d4"></div>
-            <div class="driver" id="d5"></div>
-            <div class="driver" id="d6"></div>
+            <div class="driver">Driver 1</div>
+            <div class="driver">Driver 2</div>
+            <div class="driver">Driver 3</div>
           </div>
           <div class="hint" data-i18n="s2_driver_hint">These drivers explain why the label changes.</div>
         </div>
@@ -180,7 +241,7 @@
 
           <div class="subblock">
             <div class="sub-title" data-i18n="s2_breakdown">Risk Breakdown</div>
-            <div class="mini-grid" id="s2BreakdownList">
+            <div class="mini-grid">
               <div data-i18n="bd_market">Market</div>
               <div class="right"><span id="bdMarketVal">35%</span></div>
 
@@ -197,7 +258,7 @@
 
           <div class="subblock">
             <div class="sub-title" data-i18n="s2_metrics">Key Metrics</div>
-            <div class="mini-grid" id="s2MetricsList">
+            <div class="mini-grid">
               <div>20D vol</div>
               <div class="right"><span id="metricVol20Val">48%</span></div>
 
@@ -217,7 +278,7 @@
 
           <div class="subblock">
             <div class="sub-title" data-i18n="s2_rules">Risk Label Rules</div>
-            <ul class="rules" id="s2RulesList">
+            <ul class="rules">
               <li><b data-i18n="rule_high">High</b>: <span data-i18n="rule_high_text">forward 30D drawdown</span> &gt; <span id="rHigh">12%</span></li>
               <li><b data-i18n="rule_medium">Medium</b>: <span id="rMedLo">6%</span> - <span id="rMedHi">12%</span></li>
               <li><b data-i18n="rule_low">Low</b>: &lt; <span id="rLow">6%</span></li>
@@ -233,24 +294,35 @@
         </div>
 
         <div class="chart-area">
-          <svg id="s2Chart" class="linechart" viewBox="0 0 900 220" preserveAspectRatio="none">
-            <polyline id="s2Line" fill="none" stroke-width="3"></polyline>
-            <circle id="s2Dot" r="6"></circle>
-            <text id="s2LastText" x="10" y="22" class="chart-text">Latest: 78</text>
+          <svg id="s2Chart" class="linechart" viewBox="0 0 1040 340" preserveAspectRatio="xMidYMid meet" aria-label="Stock trend chart">
+            <line id="s2GridTop" class="chart-grid" x1="110" y1="76" x2="960" y2="76"></line>
+            <line id="s2GridMid" class="chart-grid" x1="110" y1="170" x2="960" y2="170"></line>
+            <line id="s2GridBot" class="chart-grid" x1="110" y1="264" x2="960" y2="264"></line>
 
-            <text id="s2YLabel" class="axis-label" x="14" y="110" transform="rotate(-90 14 110)">Risk Score (0-100)</text>
-            <text id="s2XLabel" class="axis-label" x="450" y="214" text-anchor="middle">Time</text>
+            <line id="s2AxisY" class="chart-axis" x1="110" y1="76" x2="110" y2="264"></line>
+            <line id="s2AxisX" class="chart-axis" x1="110" y1="264" x2="960" y2="264"></line>
 
-            <text id="s2YTick100" class="axis-tick" x="22" y="38">100</text>
-            <text id="s2YTick50" class="axis-tick" x="22" y="118">50</text>
-            <text id="s2YTick0" class="axis-tick" x="22" y="198">0</text>
+            <polygon id="s2ForecastArea" class="chart-forecast-area"></polygon>
+            <polyline id="s2HistLine" class="chart-history-line"></polyline>
+            <polyline id="s2ProjLine" class="chart-proj-line"></polyline>
+            <circle id="s2ProjStart" class="chart-proj-start" r="5" vector-effect="non-scaling-stroke"></circle>
+            <circle id="s2Dot" class="chart-last-dot" r="8" vector-effect="non-scaling-stroke"></circle>
 
-            <text id="s2XStart" class="axis-tick" x="20" y="214" text-anchor="start">Start</text>
-            <text id="s2XEnd" class="axis-tick" x="880" y="214" text-anchor="end">End</text>
+            <text id="s2YLabel" class="axis-label axis-label-top" x="110" y="28">AAPL history + forecast</text>
+            <text id="s2LastText" x="110" y="52" class="chart-text chart-latest">Latest: 78</text>
+            <text id="s2XLabel" class="axis-label axis-label-x" x="535" y="326" text-anchor="middle">Time</text>
+
+            <text id="s2YTick100" class="axis-tick" x="92" y="82" text-anchor="end">100</text>
+            <text id="s2YTick50" class="axis-tick" x="92" y="176" text-anchor="end">50</text>
+            <text id="s2YTick0" class="axis-tick" x="92" y="270" text-anchor="end">0</text>
+
+            <text id="s2XStart" class="axis-tick" x="110" y="292" text-anchor="start">Start</text>
+            <text id="s2XMid" class="axis-tick" x="535" y="292" text-anchor="middle">Middle</text>
+            <text id="s2XEnd" class="axis-tick" x="960" y="292" text-anchor="end">End</text>
           </svg>
         </div>
 
-        <div class="footnote" data-i18n="chart_note">Line updates with prediction and time range.</div>
+        <div class="footnote" data-i18n="chart_note">The line updates with prediction and selected time range.</div>
       </div>
     </section>
 
@@ -274,7 +346,8 @@
       <div id="watchlistGrid" class="grid watchlist"></div>
 
       <div class="note">
-        <b data-i18n="flow">Flow:</b> S2 → Add to Watchlist → Watchlist → View Details → S2
+        <b data-i18n="flow">Flow:</b>
+        <span id="wlFlowNote" data-i18n="wl_flow_note">S2 → Add to Watchlist → Watchlist → View Details → S2</span>
       </div>
     </section>
 
@@ -311,12 +384,12 @@
 
           <div class="chart-stack">
             <div class="chart-box">
-              <div class="sub-title">Risk score ranking</div>
+              <div class="sub-title" data-i18n="cmp_rank_title">Risk score ranking</div>
               <div id="cmpRankingChart" class="cmp-ranking-chart"></div>
             </div>
 
             <div class="chart-box">
-              <div class="sub-title">Risk trend</div>
+              <div class="sub-title" data-i18n="cmp_trend_title">Risk trend</div>
 
               <svg id="cmpTrendChart" viewBox="0 0 620 280" preserveAspectRatio="none" class="cmp-trend-svg">
                 <line x1="70" y1="40" x2="580" y2="40" class="cmp-grid-line"></line>
@@ -336,8 +409,8 @@
                 <text id="cmpXMid" x="325" y="244" text-anchor="middle" class="cmp-axis-text">Middle</text>
                 <text id="cmpXEnd" x="580" y="244" text-anchor="end" class="cmp-axis-text">End</text>
 
-                <text x="325" y="268" text-anchor="middle" class="cmp-axis-title">Time</text>
-                <text x="22" y="130" text-anchor="middle" transform="rotate(-90 22 130)" class="cmp-axis-title">Risk Score</text>
+                <text x="325" y="268" text-anchor="middle" class="cmp-axis-title" data-i18n="axis_time">Time</text>
+                <text x="22" y="130" text-anchor="middle" transform="rotate(-90 22 130)" class="cmp-axis-title" data-i18n="axis_risk_score">Risk Score</text>
 
                 <g id="cmpTrendLines"></g>
                 <g id="cmpTrendDots"></g>
@@ -385,13 +458,13 @@
           </div>
 
           <div class="footnote" data-i18n="rep_note">
-            This prototype shows structure and export buttons (no real PDF).
+            This prototype shows the structure and export buttons only (no real PDF export).
           </div>
         </div>
 
         <div class="card reports-preview-card">
           <h2 class="card-title" data-i18n="rep_preview">Report Preview</h2>
-          <div id="reportPreview" class="preview">
+          <div id="reportPreview" class="preview" data-generated="0">
             <div class="muted" data-i18n="rep_preview_hint">Click Generate Report to preview.</div>
           </div>
         </div>
@@ -416,14 +489,14 @@
             <div class="v">
               <select id="setTheme" class="select">
                 <option value="dark" selected data-i18n="theme_dark">Dark</option>
-                <option value="light" data-i18n="theme_light">Light (placeholder)</option>
+                <option value="light" data-i18n="theme_light">Light</option>
               </select>
             </div>
 
             <div class="k" data-i18n="set_lang">Language</div>
             <div class="v">
               <select id="setLang" class="select">
-                <option value="en" selected>English</option>
+                <option value="en">English</option>
                 <option value="zh">中文</option>
               </select>
             </div>
@@ -438,13 +511,13 @@
           <div class="checks">
             <label><input type="checkbox" id="setAlertsOn" checked /> <span data-i18n="alerts_enable">Enable alerts</span></label>
             <label>
-              <span data-i18n="alerts_score">Notify if Risk Score &gt;</span>
+              <span data-i18n="alerts_score">Notify if Risk Score ></span>
               <input id="setScoreTh" class="mini-input" value="70" />
             </label>
             <label><input type="checkbox" id="setHighOn" checked /> <span data-i18n="alerts_high">Notify if Risk Level = High</span></label>
           </div>
 
-          <div class="footnote" data-i18n="alerts_note">Works with Watchlist filtering and monitoring.</div>
+          <div class="footnote" data-i18n="alerts_note">Used for watchlist filtering and monitoring.</div>
         </div>
 
         <div class="card">
