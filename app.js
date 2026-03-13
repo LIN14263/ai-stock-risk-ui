@@ -380,9 +380,7 @@ const DEFAULT_UI_SETTINGS = {
   scoreTh: 70,
   highOn: true,
   dataSource: "price",
-  updateFreq: "daily",
-  lastSyncTs: 0,
-  refreshNonce: 0
+  updateFreq: "daily"
 };
 const DEFAULT_WATCHLIST = ["AAPL", "300750.SZ", "600519.SS", "TSLA", "NVDA"];
 const DEFAULT_COMPARE_LIST = ["AAPL", "300750.SZ", "600519.SS"];
@@ -611,9 +609,7 @@ function loadUISettings() {
         ...raw,
         alertsOn: raw.alertsOn !== false,
         highOn: raw.highOn !== false,
-        scoreTh: clamp(Number(raw.scoreTh ?? DEFAULT_UI_SETTINGS.scoreTh), 1, 100),
-        lastSyncTs: Number(raw.lastSyncTs || 0),
-        refreshNonce: Number(raw.refreshNonce || 0)
+        scoreTh: clamp(Number(raw.scoreTh ?? DEFAULT_UI_SETTINGS.scoreTh), 1, 100)
       };
     }
   } catch (e) {
@@ -624,15 +620,6 @@ function loadUISettings() {
 
 function persistUISettings() {
   localStorage.setItem("uiSettings", JSON.stringify(uiSettings));
-}
-
-function markSyncNow({ bumpVersion = false } = {}) {
-  uiSettings.lastSyncTs = Date.now();
-  if (bumpVersion) uiSettings.refreshNonce = Number(uiSettings.refreshNonce || 0) + 1;
-  persistUISettings();
-  const sync = document.getElementById("setSync");
-  if (sync) sync.textContent = formatSyncTime(uiSettings.lastSyncTs);
-  updateSettingsLiveStatus();
 }
 
 function loadArrayStorage(key, fallback) {
@@ -695,16 +682,6 @@ function collectUISettingsFromDom() {
   };
 }
 
-function formatSyncTime(ts) {
-  const n = Number(ts || 0);
-  if (!Number.isFinite(n) || n <= 0) return '-';
-  try {
-    return new Date(n).toLocaleString();
-  } catch (e) {
-    return '-';
-  }
-}
-
 function syncSettingsForm() {
   const theme = document.getElementById("setTheme");
   if (theme) theme.value = uiSettings.theme;
@@ -720,8 +697,6 @@ function syncSettingsForm() {
   if (data) data.value = uiSettings.dataSource;
   const freq = document.getElementById("setFreq");
   if (freq) freq.value = uiSettings.updateFreq;
-  const sync = document.getElementById("setSync");
-  if (sync) sync.textContent = formatSyncTime(uiSettings.lastSyncTs);
 }
 
 function getDataSourceLabel() {
@@ -733,7 +708,7 @@ function getUpdateFrequencyLabel() {
 }
 
 function getAutoRefreshMs() {
-  return uiSettings.updateFreq === "weekly" ? 45000 : 15000;
+  return uiSettings.updateFreq === "weekly" ? 30000 : 12000;
 }
 
 function getIncludedReportSections() {
@@ -761,7 +736,7 @@ function getAlertStateForPrediction(pred) {
 }
 
 function buildNewsInsightPack(ticker, pred) {
-  const seed = hashTickerSeed(`news:${ticker}:${currentRange}:${uiSettings.dataSource}:${uiSettings.refreshNonce || 0}`);
+  const seed = hashTickerSeed(`news:${ticker}:${currentRange}:${uiSettings.dataSource}`);
   const moodScore = ((seed % 9) - 4) + (Number(pred?.d7 || 0) > 0 ? 1 : Number(pred?.d7 || 0) < 0 ? -1 : 0);
   const sentimentKey = moodScore >= 2 ? "pos" : moodScore <= -2 ? "neg" : "neu";
   const sentiment = sentimentKey === "pos" ? t("rep_sent_pos") : sentimentKey === "neg" ? t("rep_sent_neg") : t("rep_sent_neu");
@@ -811,10 +786,7 @@ function updateSettingsLiveStatus() {
   if (!box) return;
   const alertsLabel = uiSettings.alertsOn ? t("rep_on") : t("rep_off");
   box.className = "footnote settings-live-status";
-  const waitSec = Math.max(1, Math.round(getAutoRefreshMs() / 1000));
-  const nextHint = currentLang === 'zh' ? `自动刷新约每 ${waitSec} 秒执行一次。` : `Auto refresh runs about every ${waitSec} seconds.`;
-  const syncHint = currentLang === 'zh' ? `最后同步：${formatSyncTime(uiSettings.lastSyncTs)}` : `Last sync: ${formatSyncTime(uiSettings.lastSyncTs)}`;
-  box.innerHTML = `${escapeHtml(fillTemplate(t("set_status_ready"), { mode: getDataSourceLabel(), freq: getUpdateFrequencyLabel(), alerts: alertsLabel }))}<br>${escapeHtml(nextHint)}<br>${escapeHtml(syncHint)}<br>${escapeHtml(t("set_status_saved"))}`;
+  box.innerHTML = `${escapeHtml(fillTemplate(t("set_status_ready"), { mode: getDataSourceLabel(), freq: getUpdateFrequencyLabel(), alerts: alertsLabel }))}<br>${escapeHtml(t("set_status_saved"))}`;
 }
 
 async function rerenderGeneratedReportIfNeeded() {
@@ -1177,7 +1149,7 @@ function generateOfflineHistory(ticker, range) {
   const profile = getTickerProfile(ticker);
   const cfg = getRangeConfig(range);
   const pattern = getTickerPatternConfig(profile);
-  const rand = seededRandom(hashTickerSeed(`${profile.clean}:${range}:history:v4:${uiSettings.refreshNonce || 0}`));
+  const rand = seededRandom(hashTickerSeed(`${profile.clean}:${range}:history:v4`));
   const shockMap = buildShockMap(cfg.points, profile.seed ^ hashTickerSeed(`${range}:detail`), cfg.shockScale * pattern.shockBoost);
   const end = new Date();
   const series = [];
@@ -2781,8 +2753,10 @@ function startAutoRefresh() {
     try {
       await refreshDashboardData();
       await refreshCompareData();
-      markSyncNow({ bumpVersion: true });
+      const setSync = document.getElementById("setSync");
+      if (setSync) setSync.textContent = new Date().toLocaleString();
       await rerenderGeneratedReportIfNeeded();
+      updateSettingsLiveStatus();
     } catch (e) {
       console.error("Auto refresh failed:", e);
     }
@@ -3025,20 +2999,23 @@ document.getElementById("forecastExportBtn")?.addEventListener("click", () => {
     if (langChanged) {
       await applyLanguage(uiSettings.lang);
     }
-    markSyncNow({ bumpVersion: true });
+    const sync = document.getElementById("setSync");
+    if (sync) sync.textContent = new Date().toLocaleString();
     await applyRuntimeSettings();
     persistCollections();
-    alert(currentLang === "zh" ? "设置已保存。数据来源、刷新频率和提醒阈值现在都会真正影响页面内容。" : "Settings saved. Data source, refresh frequency, and alert thresholds now actively affect the page.");
+    alert(currentLang === "zh" ? "设置已保存，并已同步到报告、首页、观察名单和下次打开页面。" : "Settings saved and applied to reports, dashboard, watchlist, and the next session.");
   });
 
   document.getElementById("setRefreshBtn")?.addEventListener("click", async () => {
-    markSyncNow({ bumpVersion: true });
+    const sync = document.getElementById("setSync");
+    if (sync) sync.textContent = new Date().toLocaleString();
     persistAppState();
     await refreshDashboardData();
     await refreshCompareData();
     await requestAndRenderForecast(selectedTicker, currentRange, currentForecastDays);
     await rerenderGeneratedReportIfNeeded();
-    alert(currentLang === "zh" ? "已刷新。当前股票、右侧报告、观察名单评分和最后同步时间都已更新。" : "Data refreshed. Current ticker, report sidebar, watchlist scores, and last sync time were updated.");
+    updateSettingsLiveStatus();
+    alert(currentLang === "zh" ? "已刷新，右侧报告和首页摘要也已同步更新。" : "Data refreshed. The report sidebar and dashboard summary were also updated.");
   });
 
   document.getElementById("setLang")?.addEventListener("change", async (e) => {
@@ -3056,20 +3033,12 @@ document.getElementById("forecastExportBtn")?.addEventListener("click", () => {
   });
 
   document.getElementById("setData")?.addEventListener("change", async () => {
-    markSyncNow({ bumpVersion: true });
     await applyRuntimeSettings();
-    const msg = currentLang === 'zh'
-      ? (uiSettings.dataSource === 'price_news' ? '已切换到“价格 + 新闻”，报告右侧会加入情绪/新闻信号。' : '已切换到“仅价格”，页面将只显示价格驱动内容。')
-      : (uiSettings.dataSource === 'price_news' ? 'Switched to Price + News. The report sidebar now includes sentiment/news signals.' : 'Switched to Price only. The page now focuses on price-driven content.');
-    alert(msg);
   });
 
   document.getElementById("setFreq")?.addEventListener("change", async () => {
-    markSyncNow({ bumpVersion: false });
     await applyRuntimeSettings({ refresh: false });
     await rerenderGeneratedReportIfNeeded();
-    const sec = Math.round(getAutoRefreshMs() / 1000);
-    alert(currentLang === 'zh' ? `刷新频率已切换为${getUpdateFrequencyLabel()}，自动刷新约每 ${sec} 秒执行一次。` : `Refresh frequency changed to ${getUpdateFrequencyLabel()}. Auto refresh now runs about every ${sec} seconds.`);
   });
 
   document.getElementById("setAlertsOn")?.addEventListener("change", async () => {
@@ -3092,10 +3061,6 @@ document.getElementById("forecastExportBtn")?.addEventListener("click", () => {
   });
 
   uiSettings = loadUISettings();
-  if (!uiSettings.lastSyncTs) {
-    uiSettings.lastSyncTs = Date.now();
-    persistUISettings();
-  }
   watchlist = loadArrayStorage("watchlist", DEFAULT_WATCHLIST);
   compareList = loadArrayStorage("compareList", DEFAULT_COMPARE_LIST);
   const appState = loadAppState();
